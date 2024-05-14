@@ -1,7 +1,7 @@
 import aws_cdk as core
 import aws_cdk.assertions as assertions
 
-from openchallenges.openchallenges_stack import OpenchallengesStack
+from openchallenges.app_stack import OpenchallengesStack
 
 # example tests. To run these tests, uncomment this file along with the example
 # resource in openchallenges/openchallenges_stack.py

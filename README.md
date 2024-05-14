@@ -1,5 +1,6 @@
 
-# Welcome to your CDK Python project!
+# openchallenges
+OpenChallenges (OC) is a centralized hub for biomedical challenges
 
 This is a blank project for CDK development with Python.
 
