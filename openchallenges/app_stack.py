@@ -20,7 +20,7 @@ class AppStack(cdk.Stack):
     ECS task
     """
 
-    def __init__(self, scope: Construct, construct_id: str, id: str, props: ServiceProps, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, props: ServiceProps, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # ECS task with fargate
@@ -41,7 +41,7 @@ class AppStack(cdk.Stack):
                 )
             ],
             logging=ecs.LogDrivers.aws_logs(
-                stream_prefix=f'{id}',
+                stream_prefix=f'{construct_id}',
                 mode=ecs.AwsLogDriverMode.NON_BLOCKING,
                 max_buffer_size=size.mebibytes(25)
             ),
@@ -64,12 +64,11 @@ class AppStack(cdk.Stack):
         if id=="mariadb":
             self.volume = ecs.ServiceManagedVolume(
                 self,
-                f'{id}-volume',
-                name=f'{id}-volume',
+                f'{construct_id}-volume',
+                name=f'{construct_id}-volume',
                 managed_ebs_volume=ecs.ServiceManagedEBSVolumeConfiguration(
                     size=size.gibibytes(30),
                     volume_type=ec2.EbsDeviceVolumeType.GP3,
-                    # file_system_type=ecs.FileSystemType.XFS
                 )
             )
 
@@ -81,7 +80,7 @@ class AppStack(cdk.Stack):
             )
 
             self.task_definition.add_volume(
-                name=f'{id}-volume',
+                name=f'{construct_id}-volume',
                 configured_at_launch=True
             )
             self.service.add_volume(self.volume)
