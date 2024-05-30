@@ -55,7 +55,7 @@ api_docs_props = ServiceProps(ecs_stack.cluster, network_stack.http_listener, ec
                          },
                         "",False,"",10)
 
-AppStack(app, "OpenChallengesApidocs", api_docs_props)
+AppStack(app, "OpenChallengesApiDocs", api_docs_props)
 
 config_server_props = ServiceProps(ecs_stack.cluster, network_stack.http_listener, ecs_stack.service_map,
                         "config-server",
@@ -108,7 +108,7 @@ thumbor_props = ServiceProps(ecs_stack.cluster, network_stack.http_listener, ecs
 AppStack(app, "OpenChallengesThumbor", thumbor_props)
 
 
-elasticache_props = ServiceProps(ecs_stack.cluster, network_stack.http_listener, ecs_stack.service_map,
+elasticsearch_props = ServiceProps(ecs_stack.cluster, network_stack.http_listener, ecs_stack.service_map,
                         "elasticache",
                         9200,
                         2048,
@@ -125,19 +125,20 @@ elasticache_props = ServiceProps(ecs_stack.cluster, network_stack.http_listener,
                                   },
                         "",False, "", 10)
 
-AppStack(app, "OpenChallengesElasticache", elasticache_props)
+AppStack(app, "OpenChallengesElastisearch", elasticsearch_props)
 
-# service_registry_props = ServiceProps(ecs_stack.cluster, network_stack.http_listener, ecs_stack.service_map,
-#                         "service_registry",
-#                         8081,
-#                         1024,
-#                         "ghcr.io/sage-bionetworks/openchallenges-service-registry:sha-8a48c0f",
-#                         {
-#                                    "SERVER_PORT":"8081",
-#                                    "DEFAULT_ZONE":"http://localhost:8081/eureka"
-#                                   },
-#                         "",False, "", 10)
-#
-# AppStack(app, "OpenChallengesServiceRegistry", service_registry_props)
+service_registry_props = ServiceProps(ecs_stack.cluster, network_stack.http_listener, ecs_stack.service_map,
+                        "service_registry",
+                        8081,
+                        1024,
+                        "ghcr.io/sage-bionetworks/openchallenges-service-registry:sha-8a48c0f",
+                        {
+                                   "SERVER_PORT":"8081",
+                                   "DEFAULT_ZONE":"http://localhost:8081/eureka",
+                                   "SPRING_CONFIG_IMPORT":"configserver:http://OpenChallengesThumbor-ServiceD69D759B-FjrKUmyymgCP.oc.org:8090"
+                                  },
+                        "",False, "", 10)
+
+AppStack(app, "OpenChallengesServiceRegistry", service_registry_props)
 
 app.synth()

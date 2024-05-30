@@ -30,6 +30,7 @@ class EcsStack(cdk.Stack):
         self.service_namespace = servicediscovery.PrivateDnsNamespace(
             self,
             "ServiceNamespace",
+            # TODO: discusss domain before making it final
             name="oc.org",
             vpc=vpc
         )
