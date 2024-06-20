@@ -8,7 +8,8 @@ from constructs import Construct
 
 class CertStack(cdk.Stack):
     """
-      create certificates which need to be done after creating a hosted zone
+      Create certificates which need to be done after creating a hosted zone
+      This requires manual verification of domain name ownership
     """
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
