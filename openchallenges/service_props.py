@@ -1,7 +1,3 @@
-from aws_cdk import (
-    aws_elasticloadbalancingv2 as elbv2,
-    aws_ecs as ecs,
-)
 
 ALB_HTTP_LISTENER_PORT = 80
 ALB_HTTPS_LISTENER_PORT = 443
@@ -12,12 +8,8 @@ class ServiceProps:
   """
   Shared stack properties
   """
-  def __init__(self, cluster:ecs.Cluster,
-               container_name:str,
-               container_port:int, container_memory:int, container_repo_url:str, container_env_vars:dict,
-               web_path:str) -> None:
-    self.cluster = cluster
-    # self.listener = listener
+  def __init__(self, container_name:str, container_port:int, container_memory:int, container_repo_url:str,
+               container_env_vars:dict, web_path:str) -> None:
     self.container_name = container_name
     self.container_port = container_port
     self.container_memory = container_memory

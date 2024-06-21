@@ -21,7 +21,7 @@ bucket_stack = BucketStack(app, "OpenChallengesBuckets")
 network_stack = NetworkStack(app, "OpenChallengesNetwork")
 ecs_stack = EcsStack(app, "OpenChallengesEcs", network_stack.vpc)
 
-elasticsearch_props = ServiceProps(ecs_stack.cluster,
+elasticsearch_props = ServiceProps(
                         "elasticsearch",
                         9200,
                         2048,
@@ -38,9 +38,9 @@ elasticsearch_props = ServiceProps(ecs_stack.cluster,
                                   },
                         "")
 
-AppStack(app, "OpenChallengesElasticsearch", elasticsearch_props)
+elasticsearch_stack = AppStack(app, "OpenChallengesElasticsearch", network_stack.vpc, ecs_stack.cluster, elasticsearch_props)
 
-thumbor_props = ServiceProps(ecs_stack.cluster,
+thumbor_props = ServiceProps(
                         "thumbor",
                         8889,
                         512,
@@ -70,9 +70,9 @@ thumbor_props = ServiceProps(ecs_stack.cluster,
                                   },
                         "")
 
-AppStack(app, "OpenChallengesThumbor", thumbor_props)
+thumbor_stack = AppStack(app, "OpenChallengesThumbor", network_stack.vpc, ecs_stack.cluster, thumbor_props)
 
-mariadb_props = ServiceProps(ecs_stack.cluster,
+mariadb_props = ServiceProps(
                         "mariadb",
                         3306,
                         512,
@@ -84,9 +84,9 @@ mariadb_props = ServiceProps(ecs_stack.cluster,
                          },
                         "")
 
-AppStack(app, "OpenChallengesMariaDb", mariadb_props)
+mariadb_stack = AppStack(app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props)
 
-api_docs_props = ServiceProps(ecs_stack.cluster,
+api_docs_props = ServiceProps(
                         "api-docs",
                         8010,
                         256,
@@ -96,9 +96,9 @@ api_docs_props = ServiceProps(ecs_stack.cluster,
                          },
                         "")
 
-AppStack(app, "OpenChallengesApiDocs", api_docs_props)
+api_docs_stack = AppStack(app, "OpenChallengesApiDocs", network_stack.vpc, ecs_stack.cluster, api_docs_props)
 
-zipkin_props = ServiceProps(ecs_stack.cluster,
+zipkin_props = ServiceProps(
                         "zipkin",
                         9411,
                         512,
@@ -106,10 +106,10 @@ zipkin_props = ServiceProps(ecs_stack.cluster,
                         {},
                         "")
 
-AppStack(app, "OpenChallengesZipkin", zipkin_props)
+zipkin_stack = AppStack(app, "OpenChallengesZipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props)
 
 
-config_server_props = ServiceProps(ecs_stack.cluster,
+config_server_props = ServiceProps(
                         "config-server",
                         8090,
                         1024,
@@ -124,9 +124,9 @@ config_server_props = ServiceProps(ecs_stack.cluster,
                                    },
                         "")
 
-config_server_stack = AppStack(app, "OpenChallengesConfigServer", config_server_props)
+config_server_stack = AppStack(app, "OpenChallengesConfigServer", network_stack.vpc, ecs_stack.cluster, config_server_props)
 
-service_registry_props = ServiceProps(ecs_stack.cluster,
+service_registry_props = ServiceProps(
                         "service-registry",
                         8081,
                         1024,
@@ -138,24 +138,83 @@ service_registry_props = ServiceProps(ecs_stack.cluster,
                                   },
                         "")
 
-service_registry_stack = AppStack(app, "OpenChallengesServiceRegistry", service_registry_props)
+service_registry_stack = AppStack(app, "OpenChallengesServiceRegistry", network_stack.vpc, ecs_stack.cluster, service_registry_props)
 service_registry_stack.add_dependency(config_server_stack)
 
-# api_gateway_props = ServiceProps(ecs_stack.cluster,
+# api_gateway_props = ServiceProps(
 #                         "api-gateway",
 #                         8082,
 #                         1024,
 #                         "ghcr.io/sage-bionetworks/openchallenges-api-gateway:sha-2f90fd8",
 #                         {
 #                                    "SERVER_PORT":"8082",
-#                                    "KEYCLOAK_URL":"http://openchallenges-keycloak:8080",  # ????
 #                                    "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka"
 #                                   },
 #                         "")
 #
-# api_gateway_stack = AppStack(app, "OpenChallengesApiGateway", api_gateway_props)
+# api_gateway_stack = AppStack(app, "OpenChallengesApiGateway", network_stack.vpc, ecs_stack.cluster, api_gateway_props)
 # api_gateway_stack.add_dependency(service_registry_stack)
 
-
+# image_service_props = ServiceProps(
+#                         "image-service",
+#                         8086,
+#                         1024,
+#                         "docker pull ghcr.io/sage-bionetworks/openchallenges-image-service:sha-2f90fd8",
+#                         {
+#                                    "SERVER_PORT":"8086",
+#                                    "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka"
+#                                   },
+#                         "")
+#
+# image_service_stack = AppStack(app, "OpenChallengesImageService", network_stack.vpc, ecs_stack.cluster, image_service_props)
+# image_service_stack.add_dependency(service_registry_stack)
+# image_service_stack.add_dependency(zipkin_stack)
+# image_service_stack.add_dependency(thumbor_stack)
+#
+#
+# challenge_service_props = ServiceProps(
+#                         "challenge-service",
+#                         8085,
+#                         1024,
+#                         "ghcr.io/sage-bionetworks/openchallenges-challenge-service:sha-0940b53",
+#                         {
+#                                    "SERVER_PORT":"8085",
+#                                    "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka",
+#                                    "DB_URL":"jdbc:mysql://mariadb:3306/challenge_service?allowLoadLocalInfile=true",
+#                                     "DB_PLATFORMS_CSV_PATH":"/workspace/BOOT-INF/classes/db/platforms.csv",
+#                                     "DB_CHALLENGES_CSV_PATH":"/workspace/BOOT-INF/classes/db/challenges.csv",
+#                                     "DB_CONTRIBUTION_ROLES_CSV_PATH":"/workspace/BOOT-INF/classes/db/contribution_roles.csv",
+#                                     "DB_INCENTIVES_CSV_PATH":"/workspace/BOOT-INF/classes/db/incentives.csv",
+#                                     "DB_INPUT_DATA_TYPE_CSV_PATH":"/workspace/BOOT-INF/classes/db/input_data_type.csv",
+#                                     "DB_SUBMISSION_TYPES_CSV_PATH":"/workspace/BOOT-INF/classes/db/submission_types.csv",
+#                                     "DB_CATEGORIES_CSV_PATH":"/workspace/BOOT-INF/classes/db/categories.csv",
+#                                     "DB_EDAM_CONCEPT_CSV_PATH":"/workspace/BOOT-INF/classes/db/edam_concept.csv"
+#                                   },
+#                         "")
+#
+# challenge_service_stack = AppStack(app, "OpenChallengesChallengeService", network_stack.vpc, ecs_stack.cluster, challenge_service_props)
+# challenge_service_stack.add_dependency(service_registry_stack)
+# challenge_service_stack.add_dependency(mariadb_stack)
+# challenge_service_stack.add_dependency(elasticsearch_stack)
+#
+#
+# organization_service_props = ServiceProps(
+#                         "organization-service",
+#                         8084,
+#                         1024,
+#                         "ghcr.io/sage-bionetworks/openchallenges-organization-service:sha-0940b53",
+#                         {
+#                                    "SERVER_PORT":"8084",
+#                                    "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka",
+#                                    "DB_URL":"jdbc:mysql://openchallenges-mariadb:3306/organization_service?allowLoadLocalInfile=true",
+#                                     "DB_ORGANIZATIONS_CSV_PATH":"/workspace/BOOT-INF/classes/db/organizations.csv",
+#                                     "DB_CONTRIBUTION_ROLES_CSV_PATH":"/workspace/BOOT-INF/classes/db/contribution_roles.csv",
+#                                   },
+#                         "")
+#
+# organization_service_stack = AppStack(app, "OpenChallengesOrganizationService", network_stack.vpc, ecs_stack.cluster, organization_service_props)
+# organization_service_stack.add_dependency(image_service_stack)
+# organization_service_stack.add_dependency(mariadb_stack)
+# organization_service_stack.add_dependency(elasticsearch_stack)
 
 app.synth()

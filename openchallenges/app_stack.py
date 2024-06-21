@@ -20,7 +20,8 @@ class AppStack(cdk.Stack):
     ECS task
     """
 
-    def __init__(self, scope: Construct, construct_id: str, props: ServiceProps, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, cluster: ecs.Cluster,
+                 props: ServiceProps, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # ECS task with fargate
@@ -50,21 +51,34 @@ class AppStack(cdk.Stack):
             )
         )
 
+        self.security_group = ec2.SecurityGroup(
+            self,
+            "SecurityGroup",
+            vpc=vpc
+        )
+        self.security_group.add_ingress_rule(
+                peer=ec2.Peer.ipv4("0.0.0.0/0"),
+                connection=ec2.Port.tcp(props.container_port),
+                description='Allow all inbound traffic'
+        )
+
         # attach ECS task to ECS cluster
         self.service = ecs.FargateService(
             self,
             "Service",
-            cluster=props.cluster,
+            cluster=cluster,
             task_definition=self.task_definition,
             enable_execute_command=True,
+            security_groups= ([self.security_group]),
             service_connect_configuration=ecs.ServiceConnectProps(
                 log_driver=ecs.LogDrivers.aws_logs(
                     stream_prefix=f'{construct_id}'
                 ),
-                services=[ecs.ServiceConnectService(
-                    port_mapping_name=props.container_name,
-                    port=props.container_port,
-                )
+                services=[
+                    ecs.ServiceConnectService(
+                        port_mapping_name=props.container_name,
+                        port=props.container_port,
+                    )
                 ]
             )
         )

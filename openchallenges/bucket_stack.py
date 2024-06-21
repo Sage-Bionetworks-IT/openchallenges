@@ -30,6 +30,11 @@ class BucketStack(cdk.Stack):
             "OpenchallengesImgBucketArn",
             value=self.openchallenges_img_bucket.bucket_arn
         )
+        cdk.CfnOutput(
+            self,
+            "OpenchallengesImgBucketName",
+            value=self.openchallenges_img_bucket.bucket_name
+        )
 
         # -------------------
         # IAM user with access to the openchallenges bucket
