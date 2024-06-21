@@ -14,6 +14,8 @@ from openchallenges.service_props import (
     CERTIFICATE_ARN
 )
 
+VPC_CIDR="10.255.91.0/24"
+
 class NetworkStack(cdk.Stack):
     """
       Openchallenge Network
@@ -28,7 +30,7 @@ class NetworkStack(cdk.Stack):
             self,
             "Vpc",
             max_azs=2,
-            ip_addresses=ec2.IpAddresses.cidr("10.255.91.0/24")
+            ip_addresses=ec2.IpAddresses.cidr(VPC_CIDR)
         )
 
         # # -------------------
