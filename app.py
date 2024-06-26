@@ -86,6 +86,21 @@ mariadb_props = ServiceProps(
 
 mariadb_stack = AppStack(app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props)
 
+# TODO: remove after testing
+test_mariadb_props = ServiceProps(
+                        "test-mariadb",
+                        3306,
+                        512,
+                        "ghcr.io/sage-bionetworks/openchallenges-mariadb:sha-8a48c0f",
+                        {
+                                "MARIADB_USER":"maria",
+                                "MARIADB_PASSWORD":configs.get("MARIADB_PASSWORD").data,
+                                "MARIADB_ROOT_PASSWORD":configs.get("MARIADB_ROOT_PASSWORD").data
+                         },
+                        "")
+
+test_mariadb_stack = AppStack(app, "OpenChallengesTestMariaDb", network_stack.vpc, ecs_stack.cluster, test_mariadb_props)
+
 api_docs_props = ServiceProps(
                         "api-docs",
                         8010,
@@ -141,63 +156,68 @@ service_registry_props = ServiceProps(
 service_registry_stack = AppStack(app, "OpenChallengesServiceRegistry", network_stack.vpc, ecs_stack.cluster, service_registry_props)
 service_registry_stack.add_dependency(config_server_stack)
 
-# api_gateway_props = ServiceProps(
-#                         "api-gateway",
-#                         8082,
-#                         1024,
-#                         "ghcr.io/sage-bionetworks/openchallenges-api-gateway:sha-2f90fd8",
-#                         {
-#                                    "SERVER_PORT":"8082",
-#                                    "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka"
-#                                   },
-#                         "")
-#
-# api_gateway_stack = AppStack(app, "OpenChallengesApiGateway", network_stack.vpc, ecs_stack.cluster, api_gateway_props)
-# api_gateway_stack.add_dependency(service_registry_stack)
+api_gateway_props = ServiceProps(
+                        "api-gateway",
+                        8082,
+                        1024,
+                        "ghcr.io/sage-bionetworks/openchallenges-api-gateway:sha-2f90fd8",
+                        {
+                                   "SERVER_PORT":"8082",
+                                   "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka",
+                                   "KEYCLOAK_URL":"http://openchallenges-keycloak:8080"
+                                  },
+                        "")
 
-# image_service_props = ServiceProps(
-#                         "image-service",
-#                         8086,
-#                         1024,
-#                         "docker pull ghcr.io/sage-bionetworks/openchallenges-image-service:sha-2f90fd8",
-#                         {
-#                                    "SERVER_PORT":"8086",
-#                                    "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka"
-#                                   },
-#                         "")
-#
-# image_service_stack = AppStack(app, "OpenChallengesImageService", network_stack.vpc, ecs_stack.cluster, image_service_props)
-# image_service_stack.add_dependency(service_registry_stack)
-# image_service_stack.add_dependency(zipkin_stack)
-# image_service_stack.add_dependency(thumbor_stack)
-#
-#
-# challenge_service_props = ServiceProps(
-#                         "challenge-service",
-#                         8085,
-#                         1024,
-#                         "ghcr.io/sage-bionetworks/openchallenges-challenge-service:sha-0940b53",
-#                         {
-#                                    "SERVER_PORT":"8085",
-#                                    "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka",
-#                                    "DB_URL":"jdbc:mysql://mariadb:3306/challenge_service?allowLoadLocalInfile=true",
-#                                     "DB_PLATFORMS_CSV_PATH":"/workspace/BOOT-INF/classes/db/platforms.csv",
-#                                     "DB_CHALLENGES_CSV_PATH":"/workspace/BOOT-INF/classes/db/challenges.csv",
-#                                     "DB_CONTRIBUTION_ROLES_CSV_PATH":"/workspace/BOOT-INF/classes/db/contribution_roles.csv",
-#                                     "DB_INCENTIVES_CSV_PATH":"/workspace/BOOT-INF/classes/db/incentives.csv",
-#                                     "DB_INPUT_DATA_TYPE_CSV_PATH":"/workspace/BOOT-INF/classes/db/input_data_type.csv",
-#                                     "DB_SUBMISSION_TYPES_CSV_PATH":"/workspace/BOOT-INF/classes/db/submission_types.csv",
-#                                     "DB_CATEGORIES_CSV_PATH":"/workspace/BOOT-INF/classes/db/categories.csv",
-#                                     "DB_EDAM_CONCEPT_CSV_PATH":"/workspace/BOOT-INF/classes/db/edam_concept.csv"
-#                                   },
-#                         "")
-#
-# challenge_service_stack = AppStack(app, "OpenChallengesChallengeService", network_stack.vpc, ecs_stack.cluster, challenge_service_props)
-# challenge_service_stack.add_dependency(service_registry_stack)
-# challenge_service_stack.add_dependency(mariadb_stack)
-# challenge_service_stack.add_dependency(elasticsearch_stack)
-#
-#
+api_gateway_stack = AppStack(app, "OpenChallengesApiGateway", network_stack.vpc, ecs_stack.cluster, api_gateway_props)
+api_gateway_stack.add_dependency(service_registry_stack)
+
+image_service_props = ServiceProps(
+                        "image-service",
+                        8086,
+                        1024,
+                        "docker pull ghcr.io/sage-bionetworks/openchallenges-image-service:sha-2f90fd8",
+                        {
+                                   "SERVER_PORT":"8086",
+                                   "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka"
+                                  },
+                        "")
+
+image_service_stack = AppStack(app, "OpenChallengesImageService", network_stack.vpc, ecs_stack.cluster, image_service_props)
+image_service_stack.add_dependency(service_registry_stack)
+image_service_stack.add_dependency(zipkin_stack)
+image_service_stack.add_dependency(thumbor_stack)
+
+
+challenge_service_props = ServiceProps(
+                        "challenge-service",
+                        8085,
+                        1024,
+                        "ghcr.io/sage-bionetworks/openchallenges-challenge-service:sha-0940b53",
+                        {
+                                   "SERVER_PORT":"8085",
+                                   "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka",
+                                    "KEYCLOAK_URL":"http://openchallenges-keycloak:8080",
+                                    "SPRING_CLOUD_CONFIG_URI":"http://config-server.oc.org:8090",
+                                    "SPRING_DATASOURCE_USERNAME":"maria",
+                                    "SPRING_DATASOURCE_PASSWORD":configs.get("MARIADB_PASSWORD").data,
+                                   "DB_URL":"jdbc:mysql://mariadb.oc.org:3306/challenge_service?allowLoadLocalInfile=true",
+                                    "DB_PLATFORMS_CSV_PATH":"/workspace/BOOT-INF/classes/db/platforms.csv",
+                                    "DB_CHALLENGES_CSV_PATH":"/workspace/BOOT-INF/classes/db/challenges.csv",
+                                    "DB_CONTRIBUTION_ROLES_CSV_PATH":"/workspace/BOOT-INF/classes/db/contribution_roles.csv",
+                                    "DB_INCENTIVES_CSV_PATH":"/workspace/BOOT-INF/classes/db/incentives.csv",
+                                    "DB_INPUT_DATA_TYPE_CSV_PATH":"/workspace/BOOT-INF/classes/db/input_data_type.csv",
+                                    "DB_SUBMISSION_TYPES_CSV_PATH":"/workspace/BOOT-INF/classes/db/submission_types.csv",
+                                    "DB_CATEGORIES_CSV_PATH":"/workspace/BOOT-INF/classes/db/categories.csv",
+                                    "DB_EDAM_CONCEPT_CSV_PATH":"/workspace/BOOT-INF/classes/db/edam_concept.csv"
+                                  },
+                        "")
+
+challenge_service_stack = AppStack(app, "OpenChallengesChallengeService", network_stack.vpc, ecs_stack.cluster, challenge_service_props)
+challenge_service_stack.add_dependency(service_registry_stack)
+challenge_service_stack.add_dependency(mariadb_stack)
+challenge_service_stack.add_dependency(elasticsearch_stack)
+
+
 # organization_service_props = ServiceProps(
 #                         "organization-service",
 #                         8084,
@@ -206,7 +226,10 @@ service_registry_stack.add_dependency(config_server_stack)
 #                         {
 #                                    "SERVER_PORT":"8084",
 #                                    "SERVICE_REGISTRY_URL":"http://service-registry:8081/eureka",
-#                                    "DB_URL":"jdbc:mysql://openchallenges-mariadb:3306/organization_service?allowLoadLocalInfile=true",
+#                                   "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
+#                                   "SPRING_DATASOURCE_USERNAME": "maria",
+#                                   "SPRING_DATASOURCE_PASSWORD": configs.get("MARIADB_PASSWORD").data,
+#                                   "DB_URL": "jdbc:mysql://mariadb.oc.org:3306/challenge_service?allowLoadLocalInfile=true",
 #                                     "DB_ORGANIZATIONS_CSV_PATH":"/workspace/BOOT-INF/classes/db/organizations.csv",
 #                                     "DB_CONTRIBUTION_ROLES_CSV_PATH":"/workspace/BOOT-INF/classes/db/contribution_roles.csv",
 #                                   },
@@ -216,5 +239,7 @@ service_registry_stack.add_dependency(config_server_stack)
 # organization_service_stack.add_dependency(image_service_stack)
 # organization_service_stack.add_dependency(mariadb_stack)
 # organization_service_stack.add_dependency(elasticsearch_stack)
+
+
 
 app.synth()
