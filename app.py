@@ -79,9 +79,7 @@ mariadb_props = ServiceProps(
                         "mariadb",
                         3306,
                         512,
-                        # "ghcr.io/sage-bionetworks/openchallenges-mariadb:sha-8842a2d",
-                        # "ghcr.io/sage-bionetworks/openchallenges-mariadb:edge",
-                        "ghcr.io/sage-bionetworks/openchallenges-mariadb:sha-9af011e",
+                        "ghcr.io/sage-bionetworks/openchallenges-mariadb:edge",
                         #"docker/mariadb",
                         {
                                 "MARIADB_USER":"maria",
