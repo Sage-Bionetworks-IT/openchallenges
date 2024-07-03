@@ -11,7 +11,7 @@ class EcsStack(cdk.Stack):
     """
       Openchallenge Buckets
     """
-    def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, namespace: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # -------------------
@@ -22,7 +22,7 @@ class EcsStack(cdk.Stack):
             "Cluster",
             vpc=vpc,
             default_cloud_map_namespace=ecs.CloudMapNamespaceOptions(
-                name="oc.org",
+                name=namespace,
                 use_for_service_connect=True,
             )
         )

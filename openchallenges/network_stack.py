@@ -20,7 +20,7 @@ class NetworkStack(cdk.Stack):
     """
       Openchallenge Network
     """
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, vpc_cidr, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # -------------------
@@ -30,7 +30,7 @@ class NetworkStack(cdk.Stack):
             self,
             "Vpc",
             max_azs=2,
-            ip_addresses=ec2.IpAddresses.cidr(VPC_CIDR)
+            ip_addresses=ec2.IpAddresses.cidr(vpc_cidr)
         )
 
         # # -------------------

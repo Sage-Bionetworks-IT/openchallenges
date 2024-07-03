@@ -17,7 +17,7 @@ from openchallenges.service_props import (
 
 class AppStack(cdk.Stack):
     """
-    ECS task
+    Application task
     """
 
     def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, cluster: ecs.Cluster,
@@ -32,19 +32,33 @@ class AppStack(cdk.Stack):
             memory_limit_mib=4096,
         )
 
+        image = ecs.ContainerImage.from_registry(props.container_location)
+        port_mapping = ecs.PortMapping(
+            name=props.container_name,
+            container_port=props.container_port,
+        )
+        if "MariaDb" in construct_id:
+            # image=ecs.ContainerImage.from_asset(props.container_location)  # build container from source
+            port_mapping = ecs.PortMapping(
+                name=props.container_name,
+                container_port=props.container_port,
+                protocol=ecs.Protocol.TCP,
+            )
+
+        if "Elasticsearch" in construct_id:
+            # image=ecs.ContainerImage.from_asset(props.container_location)  # build container from source
+            port_mapping = ecs.PortMapping(
+                name=props.container_name,
+                container_port=props.container_port,
+                app_protocol=ecs.AppProtocol.http
+            )
+
         self.container = self.task_definition.add_container(
             props.container_name,
-            # image=ecs.ContainerImage.from_asset(props.disk_path),  # build container from source
-            image=ecs.ContainerImage.from_registry(props.container_repo_url),
+            image=image,
             memory_limit_mib=props.container_memory,
             environment=props.container_env_vars,
-            port_mappings=[
-                ecs.PortMapping(
-                    name=props.container_name,
-                    container_port=props.container_port,
-                    app_protocol=ecs.AppProtocol.http
-                )
-            ],
+            port_mappings=[port_mapping],
             logging=ecs.LogDrivers.aws_logs(
                 stream_prefix=f'{construct_id}',
                 log_retention=logs.RetentionDays.FOUR_MONTHS
@@ -59,7 +73,6 @@ class AppStack(cdk.Stack):
         self.security_group.add_ingress_rule(
                 peer=ec2.Peer.ipv4("0.0.0.0/0"),
                 connection=ec2.Port.tcp(props.container_port),
-                description='Allow all inbound traffic'
         )
 
         # attach ECS task to ECS cluster
@@ -78,12 +91,13 @@ class AppStack(cdk.Stack):
                     ecs.ServiceConnectService(
                         port_mapping_name=props.container_name,
                         port=props.container_port,
+#                        dns_name=props.container_name
                     )
                 ]
             )
         )
 
-        if construct_id=="OpenChallengesMariaDb":
+        if "MariaDb" in construct_id:
             self.volume = ecs.ServiceManagedVolume(
                 self,
                 "ServiceVolume",
@@ -107,17 +121,6 @@ class AppStack(cdk.Stack):
                 read_only=False
             )
 
-
-        # this causes a bootstrap check failure [1] of [1]: max virtual memory areas
-        #   vm.max_map_count [65530] is too low, increase to at least [262144]
-        # if id=="elasticache":
-        #     ulimit = ecs.Ulimit(
-        #         name=ecs.UlimitName.MEMLOCK,
-        #         hard_limit=-1,
-        #         soft_limit=-1
-        #
-        #     )
-        #     self.container.add_ulimits(ulimit)
 
         # expose container port to ALB HTTP port
         # if construct_id=="OpenChallengesApex":

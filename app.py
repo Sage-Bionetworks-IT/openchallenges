@@ -15,11 +15,14 @@ configs = Properties()
 with open('.openchallenges', 'rb') as config_file:
   configs.load(config_file)
 
+DNS_NAMESPACE = "oc.org"
+VPC_CIDR="10.255.91.0/24"
+
 app = cdk.App()
 
 bucket_stack = BucketStack(app, "OpenChallengesBuckets")
-network_stack = NetworkStack(app, "OpenChallengesNetwork")
-ecs_stack = EcsStack(app, "OpenChallengesEcs", network_stack.vpc)
+network_stack = NetworkStack(app, "OpenChallengesNetwork", VPC_CIDR)
+ecs_stack = EcsStack(app, "OpenChallengesEcs", network_stack.vpc, DNS_NAMESPACE)
 
 elasticsearch_props = ServiceProps(
                         "elasticsearch",
@@ -77,6 +80,7 @@ mariadb_props = ServiceProps(
                         3306,
                         512,
                         "ghcr.io/sage-bionetworks/openchallenges-mariadb:edge",
+                        #"docker/mariadb",
                         {
                                 "MARIADB_USER":"maria",
                                 "MARIADB_PASSWORD":configs.get("MARIADB_PASSWORD").data,
@@ -85,6 +89,7 @@ mariadb_props = ServiceProps(
                         "")
 
 mariadb_stack = AppStack(app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props)
+
 
 api_docs_props = ServiceProps(
                         "api-docs",
@@ -203,77 +208,78 @@ challenge_service_stack = AppStack(app, "OpenChallengesChallengeService", networ
 challenge_service_stack.add_dependency(service_registry_stack)
 challenge_service_stack.add_dependency(mariadb_stack)
 challenge_service_stack.add_dependency(elasticsearch_stack)
+challenge_service_stack.add_dependency(zipkin_stack)
 
 
-# organization_service_props = ServiceProps(
-#                         "organization-service",
-#                         8084,
-#                         1024,
-#                         "ghcr.io/sage-bionetworks/openchallenges-organization-service:edge",
-#                         {
-#                                    "SERVER_PORT":"8084",
-#                                    "SPRING_CLOUD_CONFIG_URI": "http://config-server.oc.org:8090",
-#                                    "KEYCLOAK_URL":"http://openchallenges-keycloak:8080",
-#                                    "SERVICE_REGISTRY_URL":"http://service-registry.oc.org:8081/eureka",
-#                                     "SPRING_DATASOURCE_USERNAME": "maria",
-#                                     "SPRING_DATASOURCE_PASSWORD": configs.get("MARIADB_PASSWORD").data,
-#                                     "DB_URL":"jdbc:mysql://mariadb.oc.org:3306/organization_service?allowLoadLocalInfile=true",
-#                                     "DB_ORGANIZATIONS_CSV_PATH":"/workspace/BOOT-INF/classes/db/organizations.csv",
-#                                     "DB_CONTRIBUTION_ROLES_CSV_PATH":"/workspace/BOOT-INF/classes/db/contribution_roles.csv",
-#                                   },
-#                         "")
-#
-# organization_service_stack = AppStack(app, "OpenChallengesOrganizationService", network_stack.vpc, ecs_stack.cluster, organization_service_props)
-# organization_service_stack.add_dependency(image_service_stack)
-# organization_service_stack.add_dependency(mariadb_stack)
-# organization_service_stack.add_dependency(elasticsearch_stack)
-# organization_service_stack.add_dependency(zipkin_stack)
+organization_service_props = ServiceProps(
+                        "organization-service",
+                        8084,
+                        1024,
+                        "ghcr.io/sage-bionetworks/openchallenges-organization-service:edge",
+                        {
+                                   "SERVER_PORT":"8084",
+                                   "SPRING_CLOUD_CONFIG_URI": "http://config-server.oc.org:8090",
+                                   "KEYCLOAK_URL":"http://openchallenges-keycloak:8080",
+                                   "SERVICE_REGISTRY_URL":"http://service-registry.oc.org:8081/eureka",
+                                    "SPRING_DATASOURCE_USERNAME": "maria",
+                                    "SPRING_DATASOURCE_PASSWORD": configs.get("MARIADB_PASSWORD").data,
+                                    "DB_URL":"jdbc:mysql://mariadb.oc.org:3306/organization_service?allowLoadLocalInfile=true",
+                                    "DB_ORGANIZATIONS_CSV_PATH":"/workspace/BOOT-INF/classes/db/organizations.csv",
+                                    "DB_CONTRIBUTION_ROLES_CSV_PATH":"/workspace/BOOT-INF/classes/db/contribution_roles.csv",
+                                  },
+                        "")
 
-# oc_app_props = ServiceProps(
-#                         "app",
-#                         4200,
-#                         1024,
-#                         "ghcr.io/sage-bionetworks/openchallenges-app:edge",
-#                         {
-#                                     "API_DOCS_URL":"http://api-docs.oc.org:8010/api-docs",
-#                                     "APP_VERSION":"1.0.0-alpha",
-#                                     "CSR_API_URL":"http://api-gateway.oc.org:8082/api/v1",
-#                                     "DATA_UPDATED_ON":"2023-09-26",
-#                                     "ENVIRONMENT":"production",
-#                                     "GOOGLE_TAG_MANAGER_ID":"",
-#                                     "SSR_API_URL":"http://api-gateway.oc.org:8082/api/v1"
-#                                   },
-#                         "")
-#
-# oc_app_stack = AppStack(app, "OpenChallengesApp", network_stack.vpc, ecs_stack.cluster, oc_app_props)
-# oc_app_stack.add_dependency(organization_service_stack)
-# oc_app_stack.add_dependency(api_gateway_stack)
-# oc_app_stack.add_dependency(challenge_service_stack)
-# oc_app_stack.add_dependency(image_service_stack)
-#
-# apex_service_props = ServiceProps(
-#                         "apex",
-#                         800,
-#                         200,
-#                         "ghcr.io/sage-bionetworks/openchallenges-apex:edge",
-#                         {
-#                                     "API_DOCS_HOST":"api-docs.oc.org",
-#                                     "API_DOCS_PORT":"8010",
-#                                     "API_GATEWAY_HOST":"api-gateway.oc.org",
-#                                     "API_GATEWAY_PORT":"8082",
-#                                     "APP_HOST":"app.oc.org",
-#                                     "APP_PORT":"4200",
-#                                     "THUMBOR_HOST":"thumbor.oc.org",
-#                                     "THUMBOR_PORT":"8889",
-#                                     "ZIPKIN_HOST":"zipkin.oc.org",
-#                                     "ZIPKIN_PORT":"9411"
-#                                   },
-#                         "")
-#
-# apex_service_stack = AppStack(app, "OpenChallengesApex", network_stack.vpc, ecs_stack.cluster, apex_service_props)
-# apex_service_stack.add_dependency(oc_app_stack)
-# apex_service_stack.add_dependency(api_gateway_stack)
-# apex_service_stack.add_dependency(zipkin_stack)
-# apex_service_stack.add_dependency(api_docs_stack)
+organization_service_stack = AppStack(app, "OpenChallengesOrganizationService", network_stack.vpc, ecs_stack.cluster, organization_service_props)
+organization_service_stack.add_dependency(image_service_stack)
+organization_service_stack.add_dependency(mariadb_stack)
+organization_service_stack.add_dependency(elasticsearch_stack)
+organization_service_stack.add_dependency(zipkin_stack)
+
+oc_app_props = ServiceProps(
+                        "app",
+                        4200,
+                        1024,
+                        "ghcr.io/sage-bionetworks/openchallenges-app:edge",
+                        {
+                                    "API_DOCS_URL":"http://api-docs.oc.org:8010/api-docs",
+                                    "APP_VERSION":"1.0.0-alpha",
+                                    "CSR_API_URL":"http://api-gateway.oc.org:8082/api/v1",
+                                    "DATA_UPDATED_ON":"2023-09-26",
+                                    "ENVIRONMENT":"production",
+                                    "GOOGLE_TAG_MANAGER_ID":"",
+                                    "SSR_API_URL":"http://api-gateway.oc.org:8082/api/v1"
+                                  },
+                        "")
+
+oc_app_stack = AppStack(app, "OpenChallengesApp", network_stack.vpc, ecs_stack.cluster, oc_app_props)
+oc_app_stack.add_dependency(organization_service_stack)
+oc_app_stack.add_dependency(api_gateway_stack)
+oc_app_stack.add_dependency(challenge_service_stack)
+oc_app_stack.add_dependency(image_service_stack)
+
+apex_service_props = ServiceProps(
+                        "apex",
+                        8000,
+                        200,
+                        "ghcr.io/sage-bionetworks/openchallenges-apex:edge",
+                        {
+                                    "API_DOCS_HOST":"api-docs.oc.org",
+                                    "API_DOCS_PORT":"8010",
+                                    "API_GATEWAY_HOST":"api-gateway.oc.org",
+                                    "API_GATEWAY_PORT":"8082",
+                                    "APP_HOST":"app.oc.org",
+                                    "APP_PORT":"4200",
+                                    "THUMBOR_HOST":"thumbor.oc.org",
+                                    "THUMBOR_PORT":"8889",
+                                    "ZIPKIN_HOST":"zipkin.oc.org",
+                                    "ZIPKIN_PORT":"9411"
+                                  },
+                        "")
+
+apex_service_stack = AppStack(app, "OpenChallengesApex", network_stack.vpc, ecs_stack.cluster, apex_service_props)
+apex_service_stack.add_dependency(oc_app_stack)
+apex_service_stack.add_dependency(api_gateway_stack)
+apex_service_stack.add_dependency(zipkin_stack)
+apex_service_stack.add_dependency(api_docs_stack)
 
 app.synth()
