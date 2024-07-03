@@ -8,6 +8,7 @@ from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
 from openchallenges.ecs_stack import EcsStack
 from openchallenges.app_stack import AppStack
+from openchallenges.api_gateway_stack import ApiGatewayStack
 from openchallenges.service_props import ServiceProps
 
 # get configs from file
@@ -281,5 +282,7 @@ apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_gateway_stack)
 apex_service_stack.add_dependency(zipkin_stack)
 apex_service_stack.add_dependency(api_docs_stack)
+
+aws_api_gateway_stack = ApiGatewayStack(app, "OpenChallengesAwsApiGateway", network_stack.vpc, apex_service_stack.service)
 
 app.synth()
