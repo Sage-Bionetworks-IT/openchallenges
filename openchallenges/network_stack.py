@@ -1,18 +1,10 @@
 import aws_cdk as cdk
 
 from aws_cdk import (
-    aws_ec2 as ec2,
-    aws_elasticloadbalancingv2 as elbv2,
-    aws_certificatemanager as acm
+    aws_ec2 as ec2
 )
 
 from constructs import Construct
-
-from openchallenges.service_props import (
-    ALB_HTTP_LISTENER_PORT,
-    ALB_HTTPS_LISTENER_PORT,
-    CERTIFICATE_ARN
-)
 
 VPC_CIDR="10.255.91.0/24"
 
@@ -84,4 +76,3 @@ class NetworkStack(cdk.Stack):
         #         permanent=True
         #     )
         # )
-

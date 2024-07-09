@@ -279,10 +279,9 @@ apex_service_props = ServiceProps(
 
 apex_service_stack = AppStack(app, "OpenChallengesApex", network_stack.vpc, ecs_stack.cluster, apex_service_props)
 apex_service_stack.add_dependency(oc_app_stack)
-apex_service_stack.add_dependency(api_gateway_stack)
-apex_service_stack.add_dependency(zipkin_stack)
 apex_service_stack.add_dependency(api_docs_stack)
 
 aws_api_gateway_stack = ApiGatewayStack(app, "OpenChallengesAwsApiGateway", network_stack.vpc, apex_service_stack.service)
+# aws_api_gateway_stack.add_dependency(apex_service_stack)
 
 app.synth()
