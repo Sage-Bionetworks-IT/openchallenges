@@ -1,6 +1,7 @@
 import aws_cdk as cdk
 
 from aws_cdk import (
+    aws_elasticloadbalancingv2 as elbv2,
     aws_ecs as ecs,
     aws_ec2 as ec2,
     aws_logs as logs,
@@ -9,10 +10,6 @@ from aws_cdk import (
 
 from constructs import Construct
 from openchallenges.service_props import ServiceProps
-from openchallenges.service_props import (
-    ALB_HTTP_LISTENER_PORT,
-    ALB_HTTPS_LISTENER_PORT
-)
 
 
 class AppStack(cdk.Stack):
@@ -36,6 +33,7 @@ class AppStack(cdk.Stack):
         port_mapping = ecs.PortMapping(
             name=props.container_name,
             container_port=props.container_port,
+            protocol=ecs.Protocol.TCP,
         )
         if "MariaDb" in construct_id:
             # image=ecs.ContainerImage.from_asset(props.container_location)  # build container from source
@@ -121,7 +119,6 @@ class AppStack(cdk.Stack):
                 read_only=False
             )
 
-
         # expose container port to ALB HTTP port
         # if construct_id=="OpenChallengesApex":
         #     props.listener.add_targets(
@@ -146,4 +143,3 @@ class AppStack(cdk.Stack):
         #         },
         #         deregistration_delay=cdk.Duration.seconds(10)
         #     )
-
