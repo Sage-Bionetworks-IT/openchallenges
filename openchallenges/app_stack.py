@@ -1,7 +1,6 @@
 import aws_cdk as cdk
 
 from aws_cdk import (
-    aws_elasticloadbalancingv2 as elbv2,
     aws_ecs as ecs,
     aws_ec2 as ec2,
     aws_logs as logs,
@@ -35,13 +34,6 @@ class AppStack(cdk.Stack):
             container_port=props.container_port,
             protocol=ecs.Protocol.TCP,
         )
-        if "MariaDb" in construct_id:
-            # image=ecs.ContainerImage.from_asset(props.container_location)  # build container from source
-            port_mapping = ecs.PortMapping(
-                name=props.container_name,
-                container_port=props.container_port,
-                protocol=ecs.Protocol.TCP,
-            )
 
         if "Elasticsearch" in construct_id:
             # image=ecs.ContainerImage.from_asset(props.container_location)  # build container from source
@@ -118,28 +110,3 @@ class AppStack(cdk.Stack):
                 container_path="/data/db",
                 read_only=False
             )
-
-        # expose container port to ALB HTTP port
-        # if construct_id=="OpenChallengesApex":
-        #     props.listener.add_targets(
-        #         "ListenerTarget",
-        #         priority=5,
-        #         conditions=[
-        #             elbv2.ListenerCondition.path_patterns(
-        #                 [props.web_path]
-        #             )
-        #         ],
-        #         port=ALB_HTTPS_LISTENER_PORT,
-        #         targets= [
-        #             self.service.load_balancer_target(
-        #                 container_name=props.container_name,
-        #                 container_port=props.container_port
-        #             )
-        #         ],
-        #         health_check= {
-        #             "interval": cdk.Duration.seconds(10),
-        #             "path": props.web_path,
-        #             "timeout": cdk.Duration.seconds(5),
-        #         },
-        #         deregistration_delay=cdk.Duration.seconds(10)
-        #     )
