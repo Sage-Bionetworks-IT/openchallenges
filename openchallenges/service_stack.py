@@ -14,7 +14,7 @@ from openchallenges.service_props import ServiceProps
 
 class ServiceStack(cdk.Stack):
     """
-    ECS Service task
+    ECS Service stack
     """
 
     def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, cluster: ecs.Cluster,
@@ -30,6 +30,10 @@ class ServiceStack(cdk.Stack):
         )
 
         image = ecs.ContainerImage.from_registry(props.container_location)
+        if "path://" in props.container_location:   # build container from source
+            location = props.container_location.removeprefix("path://")
+            image=ecs.ContainerImage.from_asset(location)
+
         port_mapping = ecs.PortMapping(
             name=props.container_name,
             container_port=props.container_port,
@@ -37,7 +41,6 @@ class ServiceStack(cdk.Stack):
         )
 
         if "Elasticsearch" in construct_id:
-            # image=ecs.ContainerImage.from_asset(props.container_location)  # build container from source
             port_mapping = ecs.PortMapping(
                 name=props.container_name,
                 container_port=props.container_port,
@@ -88,6 +91,7 @@ class ServiceStack(cdk.Stack):
             )
         )
 
+        # mount volume for DB
         if "MariaDb" in construct_id:
             self.volume = ecs.ServiceManagedVolume(
                 self,

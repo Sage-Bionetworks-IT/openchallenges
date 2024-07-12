@@ -9,7 +9,7 @@ from openchallenges.network_stack import NetworkStack
 from openchallenges.ecs_stack import EcsStack
 from openchallenges.service_stack import ServiceStack
 from openchallenges.service_stack import ExternalServiceStack
-from openchallenges.api_gateway_stack import ApiGatewayStack
+from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps
 
 # get configs from file
@@ -25,7 +25,7 @@ app = cdk.App()
 bucket_stack = BucketStack(app, "OpenChallengesBuckets")
 network_stack = NetworkStack(app, "OpenChallengesNetwork", VPC_CIDR)
 ecs_stack = EcsStack(app, "OpenChallengesEcs", network_stack.vpc, DNS_NAMESPACE)
-aws_api_gateway_stack = ApiGatewayStack(app, "OpenChallengesAwsApiGateway", network_stack.vpc)
+aws_api_gateway_stack = LoadBalancerStack(app, "OpenChallengesAwsApiGateway", network_stack.vpc)
 
 elasticsearch_props = ServiceProps(
                         "elasticsearch",
@@ -42,7 +42,7 @@ elasticsearch_props = ServiceProps(
                                    "discovery.type":"single-node",  # https://stackoverflow.com/a/68253868
                                    "JAVA_TOOL_OPTIONS":"-XX:InitialHeapSize=1g -XX:MaxHeapSize=1g"
                                   },
-                        "")
+                        )
 
 elasticsearch_stack = ServiceStack(app, "OpenChallengesElasticsearch", network_stack.vpc, ecs_stack.cluster, elasticsearch_props)
 
@@ -74,7 +74,7 @@ thumbor_props = ServiceProps(
                                     "AUTO_PNG_TO_JPG":"True",
                                     "HTTP_LOADER_VALIDATE_CERTS":"False"
                                   },
-                        "")
+                        )
 
 thumbor_stack = ServiceStack(app, "OpenChallengesThumbor", network_stack.vpc, ecs_stack.cluster, thumbor_props)
 
@@ -89,7 +89,7 @@ mariadb_props = ServiceProps(
                                 "MARIADB_PASSWORD":configs.get("MARIADB_PASSWORD").data,
                                 "MARIADB_ROOT_PASSWORD":configs.get("MARIADB_ROOT_PASSWORD").data
                          },
-                        "")
+                        )
 
 mariadb_stack = ServiceStack(app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props)
 
@@ -102,7 +102,7 @@ api_docs_props = ServiceProps(
                         {
                                 "PORT":"8010"
                          },
-                        "")
+                        )
 
 api_docs_stack = ServiceStack(app, "OpenChallengesApiDocs", network_stack.vpc, ecs_stack.cluster, api_docs_props)
 
@@ -112,7 +112,7 @@ zipkin_props = ServiceProps(
                         512,
                         "ghcr.io/sage-bionetworks/openchallenges-zipkin:edge",
                         {},
-                        "")
+                        )
 
 zipkin_stack = ServiceStack(app, "OpenChallengesZipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props)
 
@@ -130,7 +130,7 @@ config_server_props = ServiceProps(
                                      "GIT_URI":"git@github.com:Sage-Bionetworks/openchallenges-config-server-repository.git",
                                      "SERVER_PORT":"8090"
                                    },
-                        "")
+                        )
 
 config_server_stack = ServiceStack(app, "OpenChallengesConfigServer", network_stack.vpc, ecs_stack.cluster, config_server_props)
 
@@ -144,7 +144,7 @@ service_registry_props = ServiceProps(
                                    "DEFAULT_ZONE":"http://localhost:8081/eureka",
                                    "SPRING_CLOUD_CONFIG_URI":"http://config-server.oc.org:8090"
                                   },
-                        "")
+                        )
 
 service_registry_stack = ServiceStack(app, "OpenChallengesServiceRegistry", network_stack.vpc, ecs_stack.cluster, service_registry_props)
 service_registry_stack.add_dependency(config_server_stack)
@@ -160,7 +160,7 @@ api_gateway_props = ServiceProps(
                                    "SERVICE_REGISTRY_URL":"http://service-registry.oc.org:8081/eureka",
                                    "KEYCLOAK_URL":"http://openchallenges-keycloak:8080"
                                   },
-                        "")
+                        )
 
 api_gateway_stack = ServiceStack(app, "OpenChallengesApiGateway", network_stack.vpc, ecs_stack.cluster, api_gateway_props)
 api_gateway_stack.add_dependency(service_registry_stack)
@@ -175,7 +175,7 @@ image_service_props = ServiceProps(
                                   "SPRING_CLOUD_CONFIG_URI": "http://config-server.oc.org:8090",
                                   "SERVICE_REGISTRY_URL":"http://service-registry.oc.org:8081/eureka",
                                   },
-                        "")
+                        )
 
 image_service_stack = ServiceStack(app, "OpenChallengesImageService", network_stack.vpc, ecs_stack.cluster, image_service_props)
 image_service_stack.add_dependency(service_registry_stack)
@@ -205,7 +205,7 @@ challenge_service_props = ServiceProps(
                                     "DB_CATEGORIES_CSV_PATH":"/workspace/BOOT-INF/classes/db/categories.csv",
                                     "DB_EDAM_CONCEPT_CSV_PATH":"/workspace/BOOT-INF/classes/db/edam_concept.csv"
                                   },
-                        "")
+                        )
 
 challenge_service_stack = ServiceStack(app, "OpenChallengesChallengeService", network_stack.vpc, ecs_stack.cluster, challenge_service_props)
 challenge_service_stack.add_dependency(service_registry_stack)
@@ -230,7 +230,7 @@ organization_service_props = ServiceProps(
                                     "DB_ORGANIZATIONS_CSV_PATH":"/workspace/BOOT-INF/classes/db/organizations.csv",
                                     "DB_CONTRIBUTION_ROLES_CSV_PATH":"/workspace/BOOT-INF/classes/db/contribution_roles.csv",
                                   },
-                        "")
+                        )
 
 organization_service_stack = ServiceStack(app, "OpenChallengesOrganizationService", network_stack.vpc, ecs_stack.cluster, organization_service_props)
 organization_service_stack.add_dependency(image_service_stack)
@@ -252,7 +252,7 @@ oc_app_props = ServiceProps(
                                     "GOOGLE_TAG_MANAGER_ID":"",
                                     "SSR_API_URL":"http://api-gateway.oc.org:8082/api/v1"
                                   },
-                        "")
+                        )
 
 oc_app_stack = ServiceStack(app, "OpenChallengesApp", network_stack.vpc, ecs_stack.cluster, oc_app_props)
 oc_app_stack.add_dependency(organization_service_stack)
@@ -277,7 +277,7 @@ apex_service_props = ServiceProps(
                                     "ZIPKIN_HOST":"zipkin.oc.org",
                                     "ZIPKIN_PORT":"9411"
                                   },
-                        "")
+                        )
 
 apex_service_stack = ExternalServiceStack(app, "OpenChallengesApex", network_stack.vpc, ecs_stack.cluster,
                                           apex_service_props, aws_api_gateway_stack.alb)

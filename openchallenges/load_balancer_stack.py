@@ -12,7 +12,7 @@ ALB_HTTPS_LISTENER_PORT = 443
 # manually created cert
 CERTIFICATE_ARN = "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
 
-class ApiGatewayStack(cdk.Stack):
+class LoadBalancerStack(cdk.Stack):
     """
       API Gateway to allow access to ECS app from the internet
     """

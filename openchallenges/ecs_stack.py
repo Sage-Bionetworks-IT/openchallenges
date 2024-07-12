@@ -9,14 +9,11 @@ from constructs import Construct
 
 class EcsStack(cdk.Stack):
     """
-      Openchallenge Buckets
+      ECS cluster
     """
     def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, namespace: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # -------------------
-        # ECS cluster
-        # -------------------
         self.cluster = ecs.Cluster(
             self,
             "Cluster",

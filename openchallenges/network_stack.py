@@ -6,11 +6,9 @@ from aws_cdk import (
 
 from constructs import Construct
 
-VPC_CIDR="10.255.91.0/24"
-
 class NetworkStack(cdk.Stack):
     """
-      Openchallenge Network
+      Network for applications
     """
     def __init__(self, scope: Construct, construct_id: str, vpc_cidr, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
