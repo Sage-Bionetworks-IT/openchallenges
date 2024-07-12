@@ -16,7 +16,7 @@ check builds with `docker images`
 
 ## Tag and Push to AWS ECR
 
-### login to AWS and ECR 
+### login to AWS and ECR
 
 login to AWS:
 ```

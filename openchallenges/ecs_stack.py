@@ -7,11 +7,20 @@ from aws_cdk import (
 
 from constructs import Construct
 
+
 class EcsStack(cdk.Stack):
     """
-      ECS cluster
+    ECS cluster
     """
-    def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, namespace: str, **kwargs) -> None:
+
+    def __init__(
+        self,
+        scope: Construct,
+        construct_id: str,
+        vpc: ec2.Vpc,
+        namespace: str,
+        **kwargs
+    ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         self.cluster = ecs.Cluster(
@@ -21,7 +30,5 @@ class EcsStack(cdk.Stack):
             default_cloud_map_namespace=ecs.CloudMapNamespaceOptions(
                 name=namespace,
                 use_for_service_connect=True,
-            )
+            ),
         )
-
-
