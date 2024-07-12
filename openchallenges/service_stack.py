@@ -5,15 +5,16 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_logs as logs,
     Size as size,
+    aws_elasticloadbalancingv2 as elbv2
 )
 
 from constructs import Construct
 from openchallenges.service_props import ServiceProps
 
 
-class AppStack(cdk.Stack):
+class ServiceStack(cdk.Stack):
     """
-    Application task
+    ECS Service task
     """
 
     def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, cluster: ecs.Cluster,
@@ -110,3 +111,32 @@ class AppStack(cdk.Stack):
                 container_path="/data/db",
                 read_only=False
             )
+
+
+class ExternalServiceStack(ServiceStack):
+    """
+    We create a special service stack to allow putting the Load Balancer and the Service it is load balancing to
+    in different stacks. The benefit of different stacks is that it makes maintaining the stacks easier.
+
+    Due to the way AWS works, setting up a load balancer and ECS service in different stacks may cause cyclic references.
+    https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_ecs/README.html#using-a-load-balancer-from-a-different-stack
+
+    To work around this problem we use the "Split at listener" option from https://github.com/aws-samples/aws-cdk-examples
+    """
+
+    def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc, cluster: ecs.Cluster, props: ServiceProps,
+                 load_balancer:elbv2.ApplicationLoadBalancer, **kwargs) -> None:
+        super().__init__(scope, construct_id, vpc, cluster, props, **kwargs)
+
+        listener = elbv2.ApplicationListener(self,
+                                             "Listener",
+                                             load_balancer=load_balancer,
+                                             port=80,
+                                             open=True,
+                                             protocol=elbv2.ApplicationProtocol.HTTP
+                                             )
+        listener.add_targets("target",
+                             port=80,
+                             protocol=elbv2.ApplicationProtocol.HTTP,
+                             targets=[self.service]
+                             )
