@@ -12,4 +12,4 @@ class ServiceProps:
     self.container_memory = container_memory
     self.container_location = container_location
     self.container_env_vars = container_env_vars
-    self.web_path = web_path
+    self.web_path = web_path  # TODO: this is unused

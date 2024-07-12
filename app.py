@@ -7,7 +7,8 @@ from jproperties import Properties
 from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
 from openchallenges.ecs_stack import EcsStack
-from openchallenges.app_stack import AppStack
+from openchallenges.service_stack import ServiceStack
+from openchallenges.service_stack import ExternalServiceStack
 from openchallenges.api_gateway_stack import ApiGatewayStack
 from openchallenges.service_props import ServiceProps
 
@@ -24,6 +25,7 @@ app = cdk.App()
 bucket_stack = BucketStack(app, "OpenChallengesBuckets")
 network_stack = NetworkStack(app, "OpenChallengesNetwork", VPC_CIDR)
 ecs_stack = EcsStack(app, "OpenChallengesEcs", network_stack.vpc, DNS_NAMESPACE)
+aws_api_gateway_stack = ApiGatewayStack(app, "OpenChallengesAwsApiGateway", network_stack.vpc)
 
 elasticsearch_props = ServiceProps(
                         "elasticsearch",
@@ -42,7 +44,7 @@ elasticsearch_props = ServiceProps(
                                   },
                         "")
 
-elasticsearch_stack = AppStack(app, "OpenChallengesElasticsearch", network_stack.vpc, ecs_stack.cluster, elasticsearch_props)
+elasticsearch_stack = ServiceStack(app, "OpenChallengesElasticsearch", network_stack.vpc, ecs_stack.cluster, elasticsearch_props)
 
 thumbor_props = ServiceProps(
                         "thumbor",
@@ -74,7 +76,7 @@ thumbor_props = ServiceProps(
                                   },
                         "")
 
-thumbor_stack = AppStack(app, "OpenChallengesThumbor", network_stack.vpc, ecs_stack.cluster, thumbor_props)
+thumbor_stack = ServiceStack(app, "OpenChallengesThumbor", network_stack.vpc, ecs_stack.cluster, thumbor_props)
 
 mariadb_props = ServiceProps(
                         "mariadb",
@@ -89,7 +91,7 @@ mariadb_props = ServiceProps(
                          },
                         "")
 
-mariadb_stack = AppStack(app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props)
+mariadb_stack = ServiceStack(app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props)
 
 
 api_docs_props = ServiceProps(
@@ -102,7 +104,7 @@ api_docs_props = ServiceProps(
                          },
                         "")
 
-api_docs_stack = AppStack(app, "OpenChallengesApiDocs", network_stack.vpc, ecs_stack.cluster, api_docs_props)
+api_docs_stack = ServiceStack(app, "OpenChallengesApiDocs", network_stack.vpc, ecs_stack.cluster, api_docs_props)
 
 zipkin_props = ServiceProps(
                         "zipkin",
@@ -112,7 +114,7 @@ zipkin_props = ServiceProps(
                         {},
                         "")
 
-zipkin_stack = AppStack(app, "OpenChallengesZipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props)
+zipkin_stack = ServiceStack(app, "OpenChallengesZipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props)
 
 
 config_server_props = ServiceProps(
@@ -130,7 +132,7 @@ config_server_props = ServiceProps(
                                    },
                         "")
 
-config_server_stack = AppStack(app, "OpenChallengesConfigServer", network_stack.vpc, ecs_stack.cluster, config_server_props)
+config_server_stack = ServiceStack(app, "OpenChallengesConfigServer", network_stack.vpc, ecs_stack.cluster, config_server_props)
 
 service_registry_props = ServiceProps(
                         "service-registry",
@@ -144,7 +146,7 @@ service_registry_props = ServiceProps(
                                   },
                         "")
 
-service_registry_stack = AppStack(app, "OpenChallengesServiceRegistry", network_stack.vpc, ecs_stack.cluster, service_registry_props)
+service_registry_stack = ServiceStack(app, "OpenChallengesServiceRegistry", network_stack.vpc, ecs_stack.cluster, service_registry_props)
 service_registry_stack.add_dependency(config_server_stack)
 
 api_gateway_props = ServiceProps(
@@ -160,7 +162,7 @@ api_gateway_props = ServiceProps(
                                   },
                         "")
 
-api_gateway_stack = AppStack(app, "OpenChallengesApiGateway", network_stack.vpc, ecs_stack.cluster, api_gateway_props)
+api_gateway_stack = ServiceStack(app, "OpenChallengesApiGateway", network_stack.vpc, ecs_stack.cluster, api_gateway_props)
 api_gateway_stack.add_dependency(service_registry_stack)
 
 image_service_props = ServiceProps(
@@ -175,7 +177,7 @@ image_service_props = ServiceProps(
                                   },
                         "")
 
-image_service_stack = AppStack(app, "OpenChallengesImageService", network_stack.vpc, ecs_stack.cluster, image_service_props)
+image_service_stack = ServiceStack(app, "OpenChallengesImageService", network_stack.vpc, ecs_stack.cluster, image_service_props)
 image_service_stack.add_dependency(service_registry_stack)
 image_service_stack.add_dependency(thumbor_stack)
 image_service_stack.add_dependency(zipkin_stack)
@@ -205,7 +207,7 @@ challenge_service_props = ServiceProps(
                                   },
                         "")
 
-challenge_service_stack = AppStack(app, "OpenChallengesChallengeService", network_stack.vpc, ecs_stack.cluster, challenge_service_props)
+challenge_service_stack = ServiceStack(app, "OpenChallengesChallengeService", network_stack.vpc, ecs_stack.cluster, challenge_service_props)
 challenge_service_stack.add_dependency(service_registry_stack)
 challenge_service_stack.add_dependency(mariadb_stack)
 challenge_service_stack.add_dependency(elasticsearch_stack)
@@ -230,7 +232,7 @@ organization_service_props = ServiceProps(
                                   },
                         "")
 
-organization_service_stack = AppStack(app, "OpenChallengesOrganizationService", network_stack.vpc, ecs_stack.cluster, organization_service_props)
+organization_service_stack = ServiceStack(app, "OpenChallengesOrganizationService", network_stack.vpc, ecs_stack.cluster, organization_service_props)
 organization_service_stack.add_dependency(image_service_stack)
 organization_service_stack.add_dependency(mariadb_stack)
 organization_service_stack.add_dependency(elasticsearch_stack)
@@ -252,7 +254,7 @@ oc_app_props = ServiceProps(
                                   },
                         "")
 
-oc_app_stack = AppStack(app, "OpenChallengesApp", network_stack.vpc, ecs_stack.cluster, oc_app_props)
+oc_app_stack = ServiceStack(app, "OpenChallengesApp", network_stack.vpc, ecs_stack.cluster, oc_app_props)
 oc_app_stack.add_dependency(organization_service_stack)
 oc_app_stack.add_dependency(api_gateway_stack)
 oc_app_stack.add_dependency(challenge_service_stack)
@@ -277,11 +279,10 @@ apex_service_props = ServiceProps(
                                   },
                         "")
 
-apex_service_stack = AppStack(app, "OpenChallengesApex", network_stack.vpc, ecs_stack.cluster, apex_service_props)
+apex_service_stack = ExternalServiceStack(app, "OpenChallengesApex", network_stack.vpc, ecs_stack.cluster,
+                                          apex_service_props, aws_api_gateway_stack.alb)
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)
 
-aws_api_gateway_stack = ApiGatewayStack(app, "OpenChallengesAwsApiGateway", network_stack.vpc, apex_service_stack.service)
-# aws_api_gateway_stack.add_dependency(apex_service_stack)
 
 app.synth()
