@@ -7,7 +7,7 @@ from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
 from openchallenges.ecs_stack import EcsStack
 from openchallenges.service_stack import ServiceStack
-from openchallenges.service_stack import ExternalServiceStack
+from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps
 
@@ -24,8 +24,8 @@ app = cdk.App()
 bucket_stack = BucketStack(app, "OpenChallengesBuckets")
 network_stack = NetworkStack(app, "OpenChallengesNetwork", VPC_CIDR)
 ecs_stack = EcsStack(app, "OpenChallengesEcs", network_stack.vpc, DNS_NAMESPACE)
-aws_api_gateway_stack = LoadBalancerStack(
-    app, "OpenChallengesAwsApiGateway", network_stack.vpc
+load_balancer_stack = LoadBalancerStack(
+    app, "OpenChallengesLoadBalancer", network_stack.vpc
 )
 
 elasticsearch_props = ServiceProps(
@@ -332,13 +332,13 @@ apex_service_props = ServiceProps(
     },
 )
 
-apex_service_stack = ExternalServiceStack(
+apex_service_stack = LoadBalancedServiceStack(
     app,
     "OpenChallengesApex",
     network_stack.vpc,
     ecs_stack.cluster,
     apex_service_props,
-    aws_api_gateway_stack.alb,
+    load_balancer_stack.alb,
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)

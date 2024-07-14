@@ -6,10 +6,16 @@ from aws_cdk import (
     aws_logs as logs,
     Size as size,
     aws_elasticloadbalancingv2 as elbv2,
+    aws_certificatemanager as acm,
 )
 
 from constructs import Construct
 from openchallenges.service_props import ServiceProps
+
+ALB_HTTP_LISTENER_PORT = 80
+ALB_HTTPS_LISTENER_PORT = 443
+# manually created cert
+CERTIFICATE_ARN = "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
 
 
 class ServiceStack(cdk.Stack):
@@ -117,14 +123,12 @@ class ServiceStack(cdk.Stack):
             )
 
 
-class ExternalServiceStack(ServiceStack):
+class LoadBalancedServiceStack(ServiceStack):
     """
-    We create a special service stack to allow putting the Load Balancer and the Service it is
-    load balancing to in different stacks. The benefit of different stacks is that it makes
-    maintaining the stacks easier.
-
-    Due to the way AWS works, setting up a load balancer and ECS service in different stacks
-    may cause cyclic references.
+    A special stack to create a ECS service fronted by a load balancer. This allows us to split up
+    the ECS services and the load balancer into separate stacks.  It makes maintaining the stacks
+    easier.  Unfortunately, due to the way AWS works, setting up a load balancer and ECS service
+    in different stacks may cause cyclic references.
     https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_ecs/README.html#using-a-load-balancer-from-a-different-stack
 
     To work around this problem we use the "Split at listener" option from
@@ -143,17 +147,55 @@ class ExternalServiceStack(ServiceStack):
     ) -> None:
         super().__init__(scope, construct_id, vpc, cluster, props, **kwargs)
 
-        listener = elbv2.ApplicationListener(
+        # -------------------
+        # ACM Certificate for HTTPS
+        # -------------------
+        self.cert = acm.Certificate.from_certificate_arn(
+            self, "Cert", certificate_arn=CERTIFICATE_ARN
+        )
+
+        http_listener = elbv2.ApplicationListener(
             self,
-            "Listener",
+            "HttpListener",
             load_balancer=load_balancer,
-            port=80,
+            port=ALB_HTTP_LISTENER_PORT,
             open=True,
             protocol=elbv2.ApplicationProtocol.HTTP,
         )
-        listener.add_targets(
-            "target",
-            port=80,
+
+        http_listener.add_targets(
+            "Target",
+            port=props.container_port,
             protocol=elbv2.ApplicationProtocol.HTTP,
             targets=[self.service],
         )
+
+        # -------------------------------
+        # Enable https and redirect http to https
+        # -------------------------------
+
+        # http_listener.add_action(
+        #     "Redirect",
+        #     action=elbv2.ListenerAction.redirect(
+        #         port=str(ALB_HTTP_LISTENER_PORT),
+        #         protocol=(elbv2.ApplicationProtocol.HTTPS).value,
+        #         # permanent=True
+        #     )
+        # )
+        #
+        # https_listener = elbv2.ApplicationListener(
+        #     self,
+        #     "HttpsListener",
+        #     load_balancer=load_balancer,
+        #     port=ALB_HTTPS_LISTENER_PORT,
+        #     open=True,
+        #     protocol=elbv2.ApplicationProtocol.HTTPS,
+        #     certificates=[self.cert]
+        # )
+        #
+        # https_listener.add_targets(
+        #     "Target",
+        #     port=props.container_port,
+        #     protocol=elbv2.ApplicationProtocol.HTTP,
+        #     targets=[self.service],
+        # )
