@@ -7,7 +7,7 @@ from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
 from openchallenges.ecs_stack import EcsStack
 from openchallenges.service_stack import ServiceStack
-from openchallenges.service_stack import ExternalServiceStack
+from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps
 
@@ -332,7 +332,7 @@ apex_service_props = ServiceProps(
     },
 )
 
-apex_service_stack = ExternalServiceStack(
+apex_service_stack = LoadBalancedServiceStack(
     app,
     "OpenChallengesApex",
     network_stack.vpc,

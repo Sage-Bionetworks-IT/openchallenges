@@ -123,14 +123,12 @@ class ServiceStack(cdk.Stack):
             )
 
 
-class ExternalServiceStack(ServiceStack):
+class LoadBalancedServiceStack(ServiceStack):
     """
-    We create a special service stack to allow putting the Load Balancer and the Service it is
-    load balancing to in different stacks. The benefit of different stacks is that it makes
-    maintaining the stacks easier.
-
-    Due to the way AWS works, setting up a load balancer and ECS service in different stacks
-    may cause cyclic references.
+    A special stack to create a ECS service fronted by a load balancer. This allows us to split up
+    the ECS services and the load balancer into separate stacks.  It makes maintaining the stacks
+    easier.  Unfortunately, due to the way AWS works, setting up a load balancer and ECS service
+    in different stacks may cause cyclic references.
     https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_ecs/README.html#using-a-load-balancer-from-a-different-stack
 
     To work around this problem we use the "Split at listener" option from
