@@ -6,7 +6,7 @@ from aws_cdk import (
     aws_logs as logs,
     Size as size,
     aws_elasticloadbalancingv2 as elbv2,
-    aws_certificatemanager as acm
+    aws_certificatemanager as acm,
 )
 
 from constructs import Construct
@@ -153,9 +153,7 @@ class ExternalServiceStack(ServiceStack):
         # ACM Certificate for HTTPS
         # -------------------
         self.cert = acm.Certificate.from_certificate_arn(
-            self,
-            "Cert",
-            certificate_arn=CERTIFICATE_ARN
+            self, "Cert", certificate_arn=CERTIFICATE_ARN
         )
 
         http_listener = elbv2.ApplicationListener(

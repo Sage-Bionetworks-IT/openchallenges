@@ -27,4 +27,3 @@ class LoadBalancerStack(cdk.Stack):
             self, "AppLoadBalancer", vpc=vpc, internet_facing=True
         )
         cdk.CfnOutput(self, "dns", value=self.alb.load_balancer_dns_name)
-
