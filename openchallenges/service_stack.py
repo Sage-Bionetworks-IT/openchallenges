@@ -47,25 +47,18 @@ class ServiceStack(cdk.Stack):
             location = props.container_location.removeprefix("path://")
             image = ecs.ContainerImage.from_asset(location)
 
-        port_mapping = ecs.PortMapping(
-            name=props.container_name,
-            container_port=props.container_port,
-            protocol=ecs.Protocol.TCP,
-        )
-
-        if "Elasticsearch" in construct_id:
-            port_mapping = ecs.PortMapping(
-                name=props.container_name,
-                container_port=props.container_port,
-                app_protocol=ecs.AppProtocol.http,
-            )
-
         self.container = self.task_definition.add_container(
             props.container_name,
             image=image,
             memory_limit_mib=props.container_memory,
             environment=props.container_env_vars,
-            port_mappings=[port_mapping],
+            port_mappings=[
+                ecs.PortMapping(
+                    name=props.container_name,
+                    container_port=props.container_port,
+                    protocol=ecs.Protocol.TCP,
+                )
+            ],
             logging=ecs.LogDrivers.aws_logs(
                 stream_prefix=f"{construct_id}",
                 log_retention=logs.RetentionDays.FOUR_MONTHS,
