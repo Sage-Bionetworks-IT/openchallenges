@@ -24,9 +24,6 @@ app = cdk.App()
 bucket_stack = BucketStack(app, "OpenChallengesBuckets")
 network_stack = NetworkStack(app, "OpenChallengesNetwork", VPC_CIDR)
 ecs_stack = EcsStack(app, "OpenChallengesEcs", network_stack.vpc, DNS_NAMESPACE)
-load_balancer_stack = LoadBalancerStack(
-    app, "OpenChallengesLoadBalancer", network_stack.vpc
-)
 
 elasticsearch_props = ServiceProps(
     "elasticsearch",
@@ -332,6 +329,14 @@ apex_service_props = ServiceProps(
     },
 )
 
+# From AWS docs https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect-concepts-deploy.html
+# The public discovery and reachability should be created last by AWS CloudFormation, including the frontend
+# client service. The services need to be created in this order to prevent an time period when the frontend
+# client service is running and available the public, but a backend isn't.
+load_balancer_stack = LoadBalancerStack(
+    app, "OpenChallengesLoadBalancer", network_stack.vpc
+)
+
 apex_service_stack = LoadBalancedServiceStack(
     app,
     "OpenChallengesApex",
@@ -342,6 +347,5 @@ apex_service_stack = LoadBalancedServiceStack(
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)
-
 
 app.synth()
