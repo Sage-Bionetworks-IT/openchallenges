@@ -173,27 +173,6 @@ service_registry_stack = ServiceStack(
 )
 service_registry_stack.add_dependency(config_server_stack)
 
-api_gateway_props = ServiceProps(
-    "api-gateway",
-    8082,
-    1024,
-    "ghcr.io/sage-bionetworks/openchallenges-api-gateway:edge",
-    {
-        "SERVER_PORT": "8082",
-        "SPRING_CLOUD_CONFIG_URI": "http://config-server.oc.org:8090",
-        "SERVICE_REGISTRY_URL": "http://service-registry.oc.org:8081/eureka",
-        "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
-    },
-)
-
-api_gateway_stack = ServiceStack(
-    app,
-    "OpenChallengesApiGateway",
-    network_stack.vpc,
-    ecs_stack.cluster,
-    api_gateway_props,
-)
-api_gateway_stack.add_dependency(service_registry_stack)
 
 image_service_props = ServiceProps(
     "image-service",
@@ -301,6 +280,28 @@ oc_app_props = ServiceProps(
         "SSR_API_URL": "http://api-gateway.oc.org:8082/api/v1",
     },
 )
+
+api_gateway_props = ServiceProps(
+    "api-gateway",
+    8082,
+    1024,
+    "ghcr.io/sage-bionetworks/openchallenges-api-gateway:edge",
+    {
+        "SERVER_PORT": "8082",
+        "SPRING_CLOUD_CONFIG_URI": "http://config-server.oc.org:8090",
+        "SERVICE_REGISTRY_URL": "http://service-registry.oc.org:8081/eureka",
+        "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
+    },
+)
+
+api_gateway_stack = ServiceStack(
+    app,
+    "OpenChallengesApiGateway",
+    network_stack.vpc,
+    ecs_stack.cluster,
+    api_gateway_props,
+)
+api_gateway_stack.add_dependency(service_registry_stack)
 
 oc_app_stack = ServiceStack(
     app, "OpenChallengesApp", network_stack.vpc, ecs_stack.cluster, oc_app_props
