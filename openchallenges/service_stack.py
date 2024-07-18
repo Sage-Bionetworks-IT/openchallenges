@@ -85,7 +85,7 @@ class ServiceStack(cdk.Stack):
                     ecs.ServiceConnectService(
                         port_mapping_name=props.container_name,
                         port=props.container_port,
-                        #                        dns_name=props.container_name
+                        dns_name=props.container_name,
                     )
                 ],
             ),
