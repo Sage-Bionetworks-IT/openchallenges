@@ -18,19 +18,19 @@ class BucketStack(cdk.Stack):
         # -------------------
         self.openchallenges_img_bucket = s3.Bucket(
             self,
-            "OpenchallengesImgBucket",
+            "ImageBucket",
             # TODO: do we need specific bucket name?
             # bucket_name="openchallenges-img",    # name is unique within a region
             object_ownership=s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
         )
         cdk.CfnOutput(
             self,
-            "OpenchallengesImgBucketArn",
+            "ImageBucketArn",
             value=self.openchallenges_img_bucket.bucket_arn,
         )
         cdk.CfnOutput(
             self,
-            "OpenchallengesImgBucketName",
+            "ImageBucketName",
             value=self.openchallenges_img_bucket.bucket_name,
         )
 
@@ -38,7 +38,9 @@ class BucketStack(cdk.Stack):
         # IAM user with access to the openchallenges bucket
         # -------------------
         self.s3_user = iam.User(
-            self, "OpenchallengesThumborUser", user_name="openchallenges-thumbor"
+            self,
+            "ThumborUser",
+            # user_name="openchallenges-thumbor"
         )
         # self.access_key = iam.AccessKey(self, "AccessKey", user=self.s3_user)
         # secret = ssm.Secret(

@@ -26,7 +26,7 @@ network_stack = NetworkStack(app, "openchallenges-network", VPC_CIDR)
 ecs_stack = EcsStack(app, "openchallenges-ecs", network_stack.vpc, DNS_NAMESPACE)
 
 mariadb_props = ServiceProps(
-    "mariadb",
+    "openchallenges-mariadb",
     3306,
     512,
     "ghcr.io/sage-bionetworks/openchallenges-mariadb:edge",
@@ -39,11 +39,11 @@ mariadb_props = ServiceProps(
 )
 
 mariadb_stack = ServiceStack(
-    app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props
+    app, "openchallenges-mariadb", network_stack.vpc, ecs_stack.cluster, mariadb_props
 )
 
 elasticsearch_props = ServiceProps(
-    "elasticsearch",
+    "openchallenges-elasticsearch",
     9200,
     2048,
     "ghcr.io/sage-bionetworks/openchallenges-elasticsearch:edge",
@@ -159,6 +159,18 @@ service_registry_stack = ServiceStack(
 )
 service_registry_stack.add_dependency(config_server_stack)
 
+zipkin_props = ServiceProps(
+    "openchallenges-zipkin",
+    9411,
+    512,
+    "ghcr.io/sage-bionetworks/openchallenges-zipkin:edge",
+    {},
+)
+
+zipkin_stack = ServiceStack(
+    app, "openchallenges-zipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props
+)
+
 image_service_props = ServiceProps(
     "openchallenges-image-service",
     8086,
@@ -169,18 +181,6 @@ image_service_props = ServiceProps(
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
         "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
     },
-)
-
-zipkin_props = ServiceProps(
-    "zipkin",
-    9411,
-    512,
-    "ghcr.io/sage-bionetworks/openchallenges-zipkin:edge",
-    {},
-)
-
-zipkin_stack = ServiceStack(
-    app, "OpenChallengesZipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props
 )
 
 image_service_stack = ServiceStack(
@@ -261,24 +261,8 @@ organization_service_stack.add_dependency(mariadb_stack)
 organization_service_stack.add_dependency(elasticsearch_stack)
 organization_service_stack.add_dependency(zipkin_stack)
 
-oc_app_props = ServiceProps(
-    "openchallenges-app",
-    4200,
-    1024,
-    "ghcr.io/sage-bionetworks/openchallenges-app:edge",
-    {
-        "API_DOCS_URL": "http://openchallenges-api-docs:8010/api-docs",
-        "APP_VERSION": "1.0.0-alpha",
-        "CSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
-        "DATA_UPDATED_ON": "2023-09-26",
-        "ENVIRONMENT": "production",
-        "GOOGLE_TAG_MANAGER_ID": "",
-        "SSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
-    },
-)
-
 api_gateway_props = ServiceProps(
-    "api-gateway",
+    "openchallenges-api-gateway",
     8082,
     1024,
     "ghcr.io/sage-bionetworks/openchallenges-api-gateway:edge",
@@ -299,6 +283,22 @@ api_gateway_stack = ServiceStack(
 )
 api_gateway_stack.add_dependency(service_registry_stack)
 
+oc_app_props = ServiceProps(
+    "openchallenges-app",
+    4200,
+    1024,
+    "ghcr.io/sage-bionetworks/openchallenges-app:edge",
+    {
+        "API_DOCS_URL": "http://openchallenges-api-docs:8010/api-docs",
+        "APP_VERSION": "1.0.0-alpha",
+        "CSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
+        "DATA_UPDATED_ON": "2023-09-26",
+        "ENVIRONMENT": "production",
+        "GOOGLE_TAG_MANAGER_ID": "",
+        "SSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
+    },
+)
+
 oc_app_stack = ServiceStack(
     app, "openchallenges-app", network_stack.vpc, ecs_stack.cluster, oc_app_props
 )
@@ -306,6 +306,14 @@ oc_app_stack.add_dependency(organization_service_stack)
 oc_app_stack.add_dependency(api_gateway_stack)
 oc_app_stack.add_dependency(challenge_service_stack)
 oc_app_stack.add_dependency(image_service_stack)
+
+# From AWS docs https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect-concepts-deploy.html
+# The public discovery and reachability should be created last by AWS CloudFormation, including the frontend
+# client service. The services need to be created in this order to prevent an time period when the frontend
+# client service is running and available the public, but a backend isn't.
+load_balancer_stack = LoadBalancerStack(
+    app, "openchallenges-load-balancer", network_stack.vpc
+)
 
 apex_service_props = ServiceProps(
     "openchallenges-apex",
@@ -324,14 +332,6 @@ apex_service_props = ServiceProps(
         "ZIPKIN_HOST": "openchallenges-zipkin",
         "ZIPKIN_PORT": "9411",
     },
-)
-
-# From AWS docs https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect-concepts-deploy.html
-# The public discovery and reachability should be created last by AWS CloudFormation, including the frontend
-# client service. The services need to be created in this order to prevent an time period when the frontend
-# client service is running and available the public, but a backend isn't.
-load_balancer_stack = LoadBalancerStack(
-    app, "openchallenges-load-balancer", network_stack.vpc
 )
 
 apex_service_stack = LoadBalancedServiceStack(
