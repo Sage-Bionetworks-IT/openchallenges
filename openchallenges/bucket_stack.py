@@ -37,11 +37,7 @@ class BucketStack(cdk.Stack):
         # -------------------
         # IAM user with access to the openchallenges bucket
         # -------------------
-        self.s3_user = iam.User(
-            self,
-            "ThumborUser",
-            # user_name="openchallenges-thumbor"
-        )
+        self.s3_user = iam.User(self, "ThumborUser", user_name="openchallenges-thumbor")
         # self.access_key = iam.AccessKey(self, "AccessKey", user=self.s3_user)
         # secret = ssm.Secret(
         #     self,
