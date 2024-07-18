@@ -24,9 +24,6 @@ app = cdk.App()
 bucket_stack = BucketStack(app, "openchallenges-buckets")
 network_stack = NetworkStack(app, "openchallenges-network", VPC_CIDR)
 ecs_stack = EcsStack(app, "openchallenges-ecs", network_stack.vpc, DNS_NAMESPACE)
-load_balancer_stack = LoadBalancerStack(
-    app, "openchallenges-load-balancer", network_stack.vpc
-)
 
 elasticsearch_props = ServiceProps(
     "elasticsearch",
@@ -176,28 +173,6 @@ service_registry_stack = ServiceStack(
 )
 service_registry_stack.add_dependency(config_server_stack)
 
-api_gateway_props = ServiceProps(
-    "openchallenges-api-gateway",
-    8082,
-    1024,
-    "ghcr.io/sage-bionetworks/openchallenges-api-gateway:edge",
-    {
-        "SERVER_PORT": "8082",
-        "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
-        "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
-        "KEYCLOAK_URL": "http://openchallenges-openchallenges-keycloak:8080",
-    },
-)
-
-api_gateway_stack = ServiceStack(
-    app,
-    "openchallenges-api-gateway",
-    network_stack.vpc,
-    ecs_stack.cluster,
-    api_gateway_props,
-)
-api_gateway_stack.add_dependency(service_registry_stack)
-
 image_service_props = ServiceProps(
     "openchallenges-image-service",
     8086,
@@ -305,6 +280,28 @@ oc_app_props = ServiceProps(
     },
 )
 
+api_gateway_props = ServiceProps(
+    "api-gateway",
+    8082,
+    1024,
+    "ghcr.io/sage-bionetworks/openchallenges-api-gateway:edge",
+    {
+        "SERVER_PORT": "8082",
+        "SPRING_CLOUD_CONFIG_URI": "http://config-server.oc.org:8090",
+        "SERVICE_REGISTRY_URL": "http://service-registry.oc.org:8081/eureka",
+        "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
+    },
+)
+
+api_gateway_stack = ServiceStack(
+    app,
+    "openchallenges-api-gateway",
+    network_stack.vpc,
+    ecs_stack.cluster,
+    api_gateway_props,
+)
+api_gateway_stack.add_dependency(service_registry_stack)
+
 oc_app_stack = ServiceStack(
     app, "openchallenges-app", network_stack.vpc, ecs_stack.cluster, oc_app_props
 )
@@ -332,6 +329,14 @@ apex_service_props = ServiceProps(
     },
 )
 
+# From AWS docs https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect-concepts-deploy.html
+# The public discovery and reachability should be created last by AWS CloudFormation, including the frontend
+# client service. The services need to be created in this order to prevent an time period when the frontend
+# client service is running and available the public, but a backend isn't.
+load_balancer_stack = LoadBalancerStack(
+    app, "openchallenges-load-balancer", network_stack.vpc
+)
+
 apex_service_stack = LoadBalancedServiceStack(
     app,
     "openchallenges-apex",
@@ -342,6 +347,5 @@ apex_service_stack = LoadBalancedServiceStack(
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)
-
 
 app.synth()
