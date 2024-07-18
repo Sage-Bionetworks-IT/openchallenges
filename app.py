@@ -16,8 +16,8 @@ configs = Properties()
 with open(".openchallenges", "rb") as config_file:
     configs.load(config_file)
 
-DNS_NAMESPACE = "oc.org"
-VPC_CIDR = "10.255.91.0/24"
+DNS_NAMESPACE = "openchallenges.io"
+VPC_CIDR = "10.255.92.0/24"
 
 app = cdk.App()
 
@@ -287,8 +287,8 @@ api_gateway_props = ServiceProps(
     "ghcr.io/sage-bionetworks/openchallenges-api-gateway:edge",
     {
         "SERVER_PORT": "8082",
-        "SPRING_CLOUD_CONFIG_URI": "http://config-server.oc.org:8090",
-        "SERVICE_REGISTRY_URL": "http://service-registry.oc.org:8081/eureka",
+        "SPRING_CLOUD_CONFIG_URI": "http://config-server:8090",
+        "SERVICE_REGISTRY_URL": "http://service-registry:8081/eureka",
         "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
     },
 )
