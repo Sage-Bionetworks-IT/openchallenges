@@ -25,6 +25,23 @@ bucket_stack = BucketStack(app, "OpenChallengesBuckets")
 network_stack = NetworkStack(app, "OpenChallengesNetwork", VPC_CIDR)
 ecs_stack = EcsStack(app, "OpenChallengesEcs", network_stack.vpc, DNS_NAMESPACE)
 
+mariadb_props = ServiceProps(
+    "mariadb",
+    3306,
+    512,
+    "ghcr.io/sage-bionetworks/openchallenges-mariadb:edge",
+    # "docker/mariadb",
+    {
+        "MARIADB_USER": "maria",
+        "MARIADB_PASSWORD": configs.get("MARIADB_PASSWORD").data,
+        "MARIADB_ROOT_PASSWORD": configs.get("MARIADB_ROOT_PASSWORD").data,
+    },
+)
+
+mariadb_stack = ServiceStack(
+    app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props
+)
+
 elasticsearch_props = ServiceProps(
     "elasticsearch",
     9200,
@@ -86,24 +103,6 @@ thumbor_stack = ServiceStack(
     app, "OpenChallengesThumbor", network_stack.vpc, ecs_stack.cluster, thumbor_props
 )
 
-mariadb_props = ServiceProps(
-    "mariadb",
-    3306,
-    512,
-    "ghcr.io/sage-bionetworks/openchallenges-mariadb:edge",
-    # "docker/mariadb",
-    {
-        "MARIADB_USER": "maria",
-        "MARIADB_PASSWORD": configs.get("MARIADB_PASSWORD").data,
-        "MARIADB_ROOT_PASSWORD": configs.get("MARIADB_ROOT_PASSWORD").data,
-    },
-)
-
-mariadb_stack = ServiceStack(
-    app, "OpenChallengesMariaDb", network_stack.vpc, ecs_stack.cluster, mariadb_props
-)
-
-
 api_docs_props = ServiceProps(
     "api-docs",
     8010,
@@ -115,19 +114,6 @@ api_docs_props = ServiceProps(
 api_docs_stack = ServiceStack(
     app, "OpenChallengesApiDocs", network_stack.vpc, ecs_stack.cluster, api_docs_props
 )
-
-zipkin_props = ServiceProps(
-    "zipkin",
-    9411,
-    512,
-    "ghcr.io/sage-bionetworks/openchallenges-zipkin:edge",
-    {},
-)
-
-zipkin_stack = ServiceStack(
-    app, "OpenChallengesZipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props
-)
-
 
 config_server_props = ServiceProps(
     "config-server",
@@ -186,6 +172,18 @@ image_service_props = ServiceProps(
     },
 )
 
+zipkin_props = ServiceProps(
+    "zipkin",
+    9411,
+    512,
+    "ghcr.io/sage-bionetworks/openchallenges-zipkin:edge",
+    {},
+)
+
+zipkin_stack = ServiceStack(
+    app, "OpenChallengesZipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props
+)
+
 image_service_stack = ServiceStack(
     app,
     "OpenChallengesImageService",
@@ -196,7 +194,6 @@ image_service_stack = ServiceStack(
 image_service_stack.add_dependency(service_registry_stack)
 image_service_stack.add_dependency(thumbor_stack)
 image_service_stack.add_dependency(zipkin_stack)
-
 
 challenge_service_props = ServiceProps(
     "challenge-service",
@@ -348,5 +345,6 @@ apex_service_stack = LoadBalancedServiceStack(
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)
+
 
 app.synth()
