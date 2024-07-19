@@ -103,18 +103,6 @@ thumbor_stack = ServiceStack(
     app, "openchallenges-thumbor", network_stack.vpc, ecs_stack.cluster, thumbor_props
 )
 
-api_docs_props = ServiceProps(
-    "openchallenges-api-docs",
-    8010,
-    256,
-    "ghcr.io/sage-bionetworks/openchallenges-api-docs:edge",
-    {"PORT": "8010"},
-)
-
-api_docs_stack = ServiceStack(
-    app, "openchallenges-api-docs", network_stack.vpc, ecs_stack.cluster, api_docs_props
-)
-
 config_server_props = ServiceProps(
     "openchallenges-config-server",
     8090,
@@ -315,6 +303,23 @@ load_balancer_stack = LoadBalancerStack(
     app, "openchallenges-load-balancer", network_stack.vpc
 )
 
+api_docs_props = ServiceProps(
+    "openchallenges-api-docs",
+    8010,
+    256,
+    "ghcr.io/sage-bionetworks/openchallenges-api-docs:edge",
+    {"PORT": "8010"},
+)
+api_docs_stack = LoadBalancedServiceStack(
+    app,
+    "openchallenges-api-docs",
+    network_stack.vpc,
+    ecs_stack.cluster,
+    api_docs_props,
+    load_balancer_stack.alb,
+    8010,
+)
+
 apex_service_props = ServiceProps(
     "openchallenges-apex",
     8000,
@@ -341,6 +346,7 @@ apex_service_stack = LoadBalancedServiceStack(
     ecs_stack.cluster,
     apex_service_props,
     load_balancer_stack.alb,
+    80,
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)
