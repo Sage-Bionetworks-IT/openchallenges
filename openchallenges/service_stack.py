@@ -136,6 +136,7 @@ class LoadBalancedServiceStack(ServiceStack):
         cluster: ecs.Cluster,
         props: ServiceProps,
         load_balancer: elbv2.ApplicationLoadBalancer,
+        listener_port: int,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, vpc, cluster, props, **kwargs)
@@ -151,7 +152,7 @@ class LoadBalancedServiceStack(ServiceStack):
             self,
             "HttpListener",
             load_balancer=load_balancer,
-            port=ALB_HTTP_LISTENER_PORT,
+            port=listener_port,
             open=True,
             protocol=elbv2.ApplicationProtocol.HTTP,
         )
