@@ -268,8 +268,8 @@ api_gateway_props = ServiceProps(
     "ghcr.io/sage-bionetworks/openchallenges-api-gateway:edge",
     {
         "SERVER_PORT": "8082",
-        "SPRING_CLOUD_CONFIG_URI": "http://config-server:8090",
-        "SERVICE_REGISTRY_URL": "http://service-registry:8081/eureka",
+        "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
+        "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
         "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
     },
 )
