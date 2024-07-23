@@ -92,7 +92,7 @@ class ServiceStack(cdk.Stack):
         )
 
         # mount volume for DB
-        if "MariaDb" in construct_id:
+        if "mariadb" in construct_id:
             self.volume = ecs.ServiceManagedVolume(
                 self,
                 "ServiceVolume",
