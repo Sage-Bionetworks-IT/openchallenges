@@ -1,6 +1,7 @@
 import aws_cdk as cdk
 
 from aws_cdk import (
+    Duration as duration,
     aws_ecs as ecs,
     aws_ec2 as ec2,
     aws_logs as logs,
@@ -157,11 +158,19 @@ class LoadBalancedServiceStack(ServiceStack):
             protocol=elbv2.ApplicationProtocol.HTTP,
         )
 
+        health_check = elbv2.HealthCheck(path="/", interval=duration.minutes(1))
+        if "apex" in construct_id:
+            health_check = elbv2.HealthCheck(
+                path="/api/v1/challenges?pageNumber=1&pageSize=1",
+                interval=duration.minutes(5),
+            )
+
         http_listener.add_targets(
             "Target",
             port=props.container_port,
             protocol=elbv2.ApplicationProtocol.HTTP,
             targets=[self.service],
+            health_check=health_check,
         )
 
         # -------------------------------
