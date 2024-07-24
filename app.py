@@ -135,6 +135,7 @@ service_registry_props = ServiceProps(
         "SERVER_PORT": "8081",
         "DEFAULT_ZONE": "http://localhost:8081/eureka",
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
+        "OPENCHALLENGES_SERVICE_REGISTRY_IS_DEPLOYED_ON_AWS": "true",
     },
 )
 
