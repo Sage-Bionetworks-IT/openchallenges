@@ -162,8 +162,9 @@ class LoadBalancedServiceStack(ServiceStack):
             path="/", interval=duration.minutes(1), enabled=False
         )
         if "apex" in construct_id:
-            health_check.path = "/health"
-            health_check.interval = duration.minutes(5)
+            health_check = elbv2.HealthCheck(
+                path="/health", interval=duration.minutes(5), enabled=False
+            )
 
         http_listener.add_targets(
             "Target",
