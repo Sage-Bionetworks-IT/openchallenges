@@ -158,12 +158,12 @@ class LoadBalancedServiceStack(ServiceStack):
             protocol=elbv2.ApplicationProtocol.HTTP,
         )
 
-        health_check = elbv2.HealthCheck(path="/", interval=duration.minutes(1))
+        health_check = elbv2.HealthCheck(
+            path="/", interval=duration.minutes(1), enabled=False
+        )
         if "apex" in construct_id:
-            health_check = elbv2.HealthCheck(
-                path="/api/v1/challenges?pageNumber=1&pageSize=1",
-                interval=duration.minutes(5),
-            )
+            health_check.path = "/health"
+            health_check.interval = duration.minutes(5)
 
         http_listener.add_targets(
             "Target",
