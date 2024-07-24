@@ -138,6 +138,8 @@ class LoadBalancedServiceStack(ServiceStack):
         props: ServiceProps,
         load_balancer: elbv2.ApplicationLoadBalancer,
         listener_port: int,
+        health_check_path: str = "/",
+        health_check_interval: int = 1,  # max is 5
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, vpc, cluster, props, **kwargs)
@@ -158,18 +160,14 @@ class LoadBalancedServiceStack(ServiceStack):
             protocol=elbv2.ApplicationProtocol.HTTP,
         )
 
-        health_check = elbv2.HealthCheck(path="/", interval=duration.minutes(1))
-        if "apex" in construct_id:
-            health_check = elbv2.HealthCheck(
-                path="/health", interval=duration.minutes(5)
-            )
-
         http_listener.add_targets(
             "Target",
             port=props.container_port,
             protocol=elbv2.ApplicationProtocol.HTTP,
             targets=[self.service],
-            health_check=health_check,
+            health_check=elbv2.HealthCheck(
+                path=health_check_path, interval=duration.minutes(health_check_interval)
+            ),
         )
 
         # -------------------------------
