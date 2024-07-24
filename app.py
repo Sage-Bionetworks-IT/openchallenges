@@ -319,7 +319,7 @@ api_docs_stack = LoadBalancedServiceStack(
     api_docs_props,
     load_balancer_stack.alb,
     8010,
-    health_check_interval=60,
+    health_check_interval=5,
 )
 
 apex_service_props = ServiceProps(
@@ -350,7 +350,7 @@ apex_service_stack = LoadBalancedServiceStack(
     load_balancer_stack.alb,
     80,
     "/health",
-    60,
+    5,
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)

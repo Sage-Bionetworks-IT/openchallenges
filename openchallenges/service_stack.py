@@ -139,7 +139,7 @@ class LoadBalancedServiceStack(ServiceStack):
         load_balancer: elbv2.ApplicationLoadBalancer,
         listener_port: int,
         health_check_path: str = "/",
-        health_check_interval: int = 1,
+        health_check_interval: int = 1,  # max is 5
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, vpc, cluster, props, **kwargs)
