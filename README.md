@@ -40,7 +40,7 @@ If you are a Windows platform, you would activate the virtualenv like this:
 Once the virtualenv is activated, you can install the required dependencies.
 
 ```
-$ pip install -r requirements.txt
+$ pip install -r requirements.txt -r requirements-dev.txt
 ```
 
 At this point you can now synthesize the CloudFormation template for this code.
@@ -72,10 +72,11 @@ Please install pre-commit, once installed the file validations will
 automatically run on every commit.  Alternatively you can manually
 execute the validations by running `pre-commit run --all-files`.
 
-Verify CDK to cloudformation conversion by running [cdk synth]:
+Verify CDK to Cloudformation conversion by running [cdk synth]:
 ```text
 cdk synth
 ```
+The Cloudformation output is saved to the `cdk.out` folder
 
 ## Unit Tests
 
