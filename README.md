@@ -72,6 +72,11 @@ Please install pre-commit, once installed the file validations will
 automatically run on every commit.  Alternatively you can manually
 execute the validations by running `pre-commit run --all-files`.
 
+Verify CDK to cloudformation conversion by running [cdk synth]:
+```text
+cdk synth
+```
+
 ## Unit Tests
 
 Tests are available in the tests folder. Execute the following to run tests:
@@ -82,12 +87,9 @@ python -m pytest tests/ -s -v
 
 # Deployment
 
-Deployment requires setting up an [AWS profile][1] then executing the
+Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) then executing the
 following command:
 
 ```text
-AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> deploy --all
+AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> cdk deploy --all
 ```
-
-
-[1]: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html
