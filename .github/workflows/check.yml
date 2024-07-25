@@ -19,7 +19,7 @@ jobs:
         with:
           cdk_subcommand: 'synth'
           actions_comment: false
-          cdk_args: '--debug'
+          cdk_args: '--verbose'
   tests:
     runs-on: ubuntu-latest
     steps:
