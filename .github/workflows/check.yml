@@ -15,7 +15,7 @@ jobs:
       - name: Static Analysis
         uses: pre-commit/action@v3.0.0
       - name: cdk synth
-        uses: youyo/aws-cdk-github-actions@v3.17
+        uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'synth'
           actions_comment: false
