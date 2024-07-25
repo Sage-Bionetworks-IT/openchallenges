@@ -2,8 +2,13 @@
 # openchallenges
 OpenChallenges (OC) is a centralized hub for biomedical challenges
 
-This is a blank project for CDK development with Python.
+# Perequisites
 
+AWS CDK projects require some bootstrapping before synthesis or deployment.
+Please review the [bootstapping documentation](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_bootstrap)
+before development.
+
+# Development
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 This project is set up like a standard Python project.  The initialization
@@ -35,7 +40,7 @@ If you are a Windows platform, you would activate the virtualenv like this:
 Once the virtualenv is activated, you can install the required dependencies.
 
 ```
-$ pip install -r requirements.txt
+$ pip install -r requirements.txt -r requirements-dev.txt
 ```
 
 At this point you can now synthesize the CloudFormation template for this code.
@@ -56,4 +61,36 @@ command.
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
 
-Enjoy!
+
+# Testing
+
+## Static Analysis
+As a pre-deployment step we syntatically validate the CDK json, yaml and
+python files with [pre-commit](https://pre-commit.com).
+
+Please install pre-commit, once installed the file validations will
+automatically run on every commit.  Alternatively you can manually
+execute the validations by running `pre-commit run --all-files`.
+
+Verify CDK to Cloudformation conversion by running [cdk synth]:
+```text
+cdk synth
+```
+The Cloudformation output is saved to the `cdk.out` folder
+
+## Unit Tests
+
+Tests are available in the tests folder. Execute the following to run tests:
+
+```
+python -m pytest tests/ -s -v
+```
+
+# Deployment
+
+Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) then executing the
+following command:
+
+```text
+AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> cdk deploy --all
+```
