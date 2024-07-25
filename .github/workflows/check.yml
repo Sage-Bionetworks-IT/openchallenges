@@ -15,11 +15,12 @@ jobs:
       - name: Static Analysis
         uses: pre-commit/action@v3.0.0
       - name: cdk synth
-        uses: youyo/aws-cdk-github-actions@v2
+        uses: youyo/aws-cdk-github-actions@v3
         with:
           cdk_subcommand: 'synth'
           actions_comment: false
-          cdk_args: '--verbose'
+          debug_log: true
+          cdk_args: '--output ./cdk.out'
   tests:
     runs-on: ubuntu-latest
     steps:
