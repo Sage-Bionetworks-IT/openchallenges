@@ -204,6 +204,7 @@ challenge_service_props = ServiceProps(
         "DB_SUBMISSION_TYPES_CSV_PATH": "/workspace/BOOT-INF/classes/db/submission_types.csv",
         "DB_CATEGORIES_CSV_PATH": "/workspace/BOOT-INF/classes/db/categories.csv",
         "DB_EDAM_CONCEPT_CSV_PATH": "/workspace/BOOT-INF/classes/db/edam_concept.csv",
+        "OPENCHALLENGES_CHALLENGE_SERVICE_IS_DEPLOYED_ON_AWS": "true",
     },
 )
 
@@ -235,6 +236,7 @@ organization_service_props = ServiceProps(
         "DB_URL": "jdbc:mysql://openchallenges-mariadb:3306/organization_service?allowLoadLocalInfile=true",
         "DB_ORGANIZATIONS_CSV_PATH": "/workspace/BOOT-INF/classes/db/organizations.csv",
         "DB_CONTRIBUTION_ROLES_CSV_PATH": "/workspace/BOOT-INF/classes/db/contribution_roles.csv",
+        "OPENCHALLENGES_ORGANIZATION_SERVICE_IS_DEPLOYED_ON_AWS": "true",
     },
 )
 
