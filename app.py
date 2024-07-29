@@ -11,19 +11,19 @@ from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps
 
-# get configs from file
+# get secrets from file
 configs = Properties()
 with open(".openchallenges", "rb") as config_file:
     configs.load(config_file)
 
-DNS_NAMESPACE = "openchallenges.io"
-VPC_CIDR = "10.255.92.0/24"
-
 app = cdk.App()
+env_context = app.node.try_get_context("dev")
 
 bucket_stack = BucketStack(app, "openchallenges-buckets")
-network_stack = NetworkStack(app, "openchallenges-network", VPC_CIDR)
-ecs_stack = EcsStack(app, "openchallenges-ecs", network_stack.vpc, DNS_NAMESPACE)
+network_stack = NetworkStack(app, "openchallenges-network", env_context["VPC_CIDR"])
+ecs_stack = EcsStack(
+    app, "openchallenges-ecs", network_stack.vpc, env_context["DNS_NAMESPACE"]
+)
 
 mariadb_props = ServiceProps(
     "openchallenges-mariadb",

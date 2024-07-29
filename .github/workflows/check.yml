@@ -25,7 +25,7 @@ jobs:
           AWS_LOADER_S3_SECRET_ACCESS_KEY=DUMMY_S3_SECRET_KEY
           SECURITY_KEY=00000
           EOT
-      - name: cdk synth
+      - name: cdk --context env=dev synth
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'synth'
