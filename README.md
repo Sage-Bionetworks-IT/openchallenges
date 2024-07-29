@@ -46,7 +46,7 @@ $ pip install -r requirements.txt -r requirements-dev.txt
 At this point you can now synthesize the CloudFormation template for this code.
 
 ```
-$ cdk --context env=prod synth
+$ cdk --context env=dev synth
 ```
 
 To add additional dependencies, for example other CDK libraries, just add
@@ -74,7 +74,7 @@ execute the validations by running `pre-commit run --all-files`.
 
 Verify CDK to Cloudformation conversion by running [cdk synth]:
 ```text
-cdk --context env=prod synth
+cdk --context env=dev synth
 ```
 The Cloudformation output is saved to the `cdk.out` folder
 
