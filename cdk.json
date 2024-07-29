@@ -62,6 +62,10 @@
     "@aws-cdk/aws-codepipeline:crossAccountKeysDefaultValueToFalse": true,
     "@aws-cdk/aws-codepipeline:defaultPipelineTypeToV2": true,
     "@aws-cdk/aws-kms:reduceCrossAccountRegionPolicyScope": true,
-    "@aws-cdk/aws-eks:nodegroupNameAttribute": true
+    "@aws-cdk/aws-eks:nodegroupNameAttribute": true,
+    "dev": {
+        "VPC_CIDR": "10.255.92.0/24",
+        "DNS_NAMESPACE": "openchallenges.io"
+      }
   }
 }
