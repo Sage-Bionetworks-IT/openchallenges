@@ -14,7 +14,23 @@ jobs:
         uses: actions/checkout@v3
       - name: Static Analysis
         uses: pre-commit/action@v3.0.0
-      - name: Dummy secrets file
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Run unit tests
+        run: python -m pytest tests/ -s -v
+  synth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Generate dummy secrets file
         run: |
           tee -a .openchallenges > /dev/null <<EOT
           MARIADB_PASSWORD=dummy
@@ -25,19 +41,10 @@ jobs:
           AWS_LOADER_S3_SECRET_ACCESS_KEY=DUMMY_S3_SECRET_KEY
           SECURITY_KEY=00000
           EOT
-      - name: cdk --context env=dev synth
+      - name: Generate cloudformation
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'synth'
           actions_comment: false
           debug_log: true
-          cdk_args: '--output ./cdk.out'
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Install dependencies
-        run: pip install -r requirements.txt -r requirements-dev.txt
-      - name: Run unit tests
-        run: python -m pytest tests/ -s -v
+          cdk_args: '--context env=dev --output ./cdk.out'
