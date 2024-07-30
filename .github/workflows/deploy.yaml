@@ -7,7 +7,7 @@ on:
     types:
       - completed
     branches:
-      - master
+      - dev
 
 # Ensures that only one deploy task per branch/environment will run at a time.
 concurrency:
@@ -28,8 +28,8 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::804034162148:role/sagebase-github-oidc-sage-bionetworks-it
-          role-session-name: ${{ steps.role-session-name.outputs.substring }}
+          role-to-assume: TBD
+          role-session-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
           role-duration-seconds: 1200
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
@@ -41,5 +41,5 @@ jobs:
           debug_log: true
           cdk_args: '--all --require-approval never'
         env:
-          ENV: "dev"
+          ENV: ${{ github.head_ref || github.ref_name }}
           SECRETS: "ssm"
