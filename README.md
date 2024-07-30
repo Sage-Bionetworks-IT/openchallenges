@@ -46,7 +46,7 @@ $ pip install -r requirements.txt -r requirements-dev.txt
 At this point you can now synthesize the CloudFormation template for this code.
 
 ```
-$ cdk --context env=dev synth
+$ cdk synth
 ```
 
 To add additional dependencies, for example other CDK libraries, just add
@@ -73,8 +73,8 @@ automatically run on every commit.  Alternatively you can manually
 execute the validations by running `pre-commit run --all-files`.
 
 Verify CDK to Cloudformation conversion by running [cdk synth]:
-```text
-cdk --context env=dev synth
+```commandline
+cdk synth
 ```
 The Cloudformation output is saved to the `cdk.out` folder
 
@@ -86,11 +86,111 @@ Tests are available in the tests folder. Execute the following to run tests:
 python -m pytest tests/ -s -v
 ```
 
+# Environments
+
+Deployment context is set in the [cdk.json](cdk.json) file.  An `ENV` environment variable must be set to
+tell the CDK which environment's variables to use when synthesising or deploying the stacks.
+
+Set an environment in cdk.json in `context` section of cdk.json:
+
+```text
+  "context": {
+    "dev": {
+        "VPC_CIDR": "10.255.92.0/24",
+        "DNS_NAMESPACE": "openchallenges-dev.io"
+      },
+    "prod": {
+        "VPC_CIDR": "10.255.93.0/24",
+        "DNS_NAMESPACE": "openchallenges.io"
+      },
+  }
+```
+
+Use `prod` environment:
+
+```commandline
+ENV=prod cdk synth
+```
+
+
+# Secrets
+
+Secrets can be stored in one of the following locations:
+  * AWS SSM parameter store
+  * Local context in [cdk.json](cdk.json) file
+
+## Loading directly from cdk.json:
+
+Set secrets directly in cdk.json in `context` section of cdk.json:
+
+```text
+  "context": {
+    "secrets": {
+        "MARIADB_PASSWORD": "Dummy",
+        "MARIADB_ROOT_PASSWORD": "Dummy",
+        "GIT_HOST_KEY": "Host123",
+        "GIT_PRIVATE_KEY": "-----BEGIN OPENSSH PRIVATE KEY-----\nDUMMY_GIT_PRIVATE_KEY\n-----END OPENSSH PRIVATE KEY-----",
+        "AWS_LOADER_S3_ACCESS_KEY_ID": "AccessKey123",
+        "AWS_LOADER_S3_SECRET_ACCESS_KEY": "SecretAccessKey123",
+        "SECURITY_KEY": "SecurityKey123"
+    }
+  }
+```
+
+## Loading from ssm parameter store:
+
+Set secrets to the SSM parameter names in `context` section of cdk.json:
+```text
+  "context": {
+    "secrets": {
+        "MARIADB_PASSWORD": "/openchallenges/MARIADB_PASSWORD",
+        "MARIADB_ROOT_PASSWORD": "/openchallenges/MARIADB_ROOT_PASSWORD",
+        "GIT_HOST_KEY": "/openchallenges/GIT_HOST_KEY",
+        "GIT_PRIVATE_KEY": "/openchallenges/GIT_PRIVATE_KEY",
+        "AWS_LOADER_S3_ACCESS_KEY_ID": "/openchallenges/AWS_LOADER_S3_ACCESS_KEY_ID",
+        "AWS_LOADER_S3_SECRET_ACCESS_KEY": "/openchallenges/AWS_LOADER_S3_SECRET_ACCESS_KEY",
+        "SECURITY_KEY": "/openchallenges/SECURITY_KEY"
+    }
+  }
+```
+
+__NOT__: The SSM parameter names contain the secret values
+
+## Specify secret location
+Set the `SECRETS` environment variable to specify the location where secrets should be loaded from.
+
+load secrets directly from cdk.json file:
+```commandline
+SECRETS=local cdk synth
+```
+
+load secrets from AWS SSM parameter store:
+```commandline
+SECRETS=ssm cdk synth
+```
+
+__NOTE__: setting `SECRETS=ssm` requires access to an AWS account
+
+## Override secrets from command line
+
+The CDK CLI allows overriding context variables:
+
+To load secrets directly from passed in values:
+```commandline
+SECRETS=local cdk --context  secrets='{"MARIADB_PASSWORD": "Dummy", "MARIADB_ROOT_PASSWORD": "Dummy", ..}' synth
+```
+
+To load secrets from SSM parameter store with overridden SSM parameter names:
+```commandline
+SECRETS=ssm cdk --context  "secrets"='{"MARIADB_PASSWORD": "/test/mariadb-root-pass", "MARIADB_ROOT_PASSWORD": "/test/mariadb-root-pass", ..}' synth
+```
+
+
 # Deployment
 
 Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) then executing the
 following command:
 
-```text
-AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> cdk deploy --all
+```commandline
+AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> ENV=dev SECRETS=ssm cdk deploy --all
 ```

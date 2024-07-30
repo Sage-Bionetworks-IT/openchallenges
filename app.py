@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-
 import aws_cdk as cdk
-from jproperties import Properties
 
 from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
@@ -10,19 +7,18 @@ from openchallenges.service_stack import ServiceStack
 from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps
-
-# get secrets from file
-configs = Properties()
-with open(".openchallenges", "rb") as config_file:
-    configs.load(config_file)
+import openchallenges.utils as utils
 
 app = cdk.App()
-env_context = app.node.try_get_context("dev")
+
+environment = utils.get_environment()
+env_vars = app.node.try_get_context(environment)
+secrets = utils.get_secrets(app)
 
 bucket_stack = BucketStack(app, "openchallenges-buckets")
-network_stack = NetworkStack(app, "openchallenges-network", env_context["VPC_CIDR"])
+network_stack = NetworkStack(app, "openchallenges-network", env_vars["VPC_CIDR"])
 ecs_stack = EcsStack(
-    app, "openchallenges-ecs", network_stack.vpc, env_context["DNS_NAMESPACE"]
+    app, "openchallenges-ecs", network_stack.vpc, env_vars["DNS_NAMESPACE"]
 )
 
 mariadb_props = ServiceProps(
@@ -33,8 +29,8 @@ mariadb_props = ServiceProps(
     # "docker/mariadb",
     {
         "MARIADB_USER": "maria",
-        "MARIADB_PASSWORD": configs.get("MARIADB_PASSWORD").data,
-        "MARIADB_ROOT_PASSWORD": configs.get("MARIADB_ROOT_PASSWORD").data,
+        "MARIADB_PASSWORD": secrets["MARIADB_PASSWORD"],
+        "MARIADB_ROOT_PASSWORD": secrets["MARIADB_ROOT_PASSWORD"],
     },
 )
 
@@ -78,10 +74,8 @@ thumbor_props = ServiceProps(
         "LOADER": "thumbor_aws.loader",
         "AWS_LOADER_REGION_NAME": "us-east-1",
         "AWS_LOADER_BUCKET_NAME": bucket_stack.openchallenges_img_bucket.bucket_name,
-        "AWS_LOADER_S3_ACCESS_KEY_ID": configs.get("AWS_LOADER_S3_ACCESS_KEY_ID").data,
-        "AWS_LOADER_S3_SECRET_ACCESS_KEY": configs.get(
-            "AWS_LOADER_S3_SECRET_ACCESS_KEY"
-        ).data,
+        "AWS_LOADER_S3_ACCESS_KEY_ID": secrets["AWS_LOADER_S3_ACCESS_KEY_ID"],
+        "AWS_LOADER_S3_SECRET_ACCESS_KEY": secrets["AWS_LOADER_S3_SECRET_ACCESS_KEY"],
         "AWS_LOADER_S3_ENDPOINT_URL": "http://s3.us-east-1.amazonaws.com",
         "AWS_LOADER_ROOT_PATH": "img",
         "STORAGE": "thumbor.storages.file_storage",
@@ -90,7 +84,7 @@ thumbor_props = ServiceProps(
         "RESULT_STORAGE_FILE_STORAGE_ROOT_PATH": "/data/result_storage",
         "RESULT_STORAGE_STORES_UNSAFE": "True",
         "RESULT_STORAGE_EXPIRATION_SECONDS": "2629746",
-        "SECURITY_KEY": configs.get("SECURITY_KEY").data,
+        "SECURITY_KEY": secrets["SECURITY_KEY"],
         "ALLOW_UNSAFE_URL": "True",
         "QUALITY": "100",
         "MAX_AGE": "86400",
@@ -111,8 +105,8 @@ config_server_props = ServiceProps(
     {
         "GIT_DEFAULT_LABEL": "test-2",
         "GIT_HOST_KEY_ALGORITHM": "ssh-ed25519",
-        "GIT_HOST_KEY": configs.get("GIT_HOST_KEY").data,
-        "GIT_PRIVATE_KEY": configs.get("GIT_PRIVATE_KEY").data,
+        "GIT_HOST_KEY": secrets["GIT_HOST_KEY"],
+        "GIT_PRIVATE_KEY": secrets["GIT_PRIVATE_KEY"],
         "GIT_URI": "git@github.com:Sage-Bionetworks/openchallenges-config-server-repository.git",
         "SERVER_PORT": "8090",
     },
@@ -193,7 +187,7 @@ challenge_service_props = ServiceProps(
         "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
         "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
         "SPRING_DATASOURCE_USERNAME": "maria",
-        "SPRING_DATASOURCE_PASSWORD": configs.get("MARIADB_PASSWORD").data,
+        "SPRING_DATASOURCE_PASSWORD": secrets["MARIADB_PASSWORD"],
         "DB_URL": "jdbc:mysql://openchallenges-mariadb:3306/challenge_service?allowLoadLocalInfile=true",
         "DB_PLATFORMS_CSV_PATH": "/workspace/BOOT-INF/classes/db/platforms.csv",
         "DB_CHALLENGES_CSV_PATH": "/workspace/BOOT-INF/classes/db/challenges.csv",
@@ -231,7 +225,7 @@ organization_service_props = ServiceProps(
         "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
         "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
         "SPRING_DATASOURCE_USERNAME": "maria",
-        "SPRING_DATASOURCE_PASSWORD": configs.get("MARIADB_PASSWORD").data,
+        "SPRING_DATASOURCE_PASSWORD": secrets["MARIADB_PASSWORD"],
         "DB_URL": "jdbc:mysql://openchallenges-mariadb:3306/organization_service?allowLoadLocalInfile=true",
         "DB_ORGANIZATIONS_CSV_PATH": "/workspace/BOOT-INF/classes/db/organizations.csv",
         "DB_CONTRIBUTION_ROLES_CSV_PATH": "/workspace/BOOT-INF/classes/db/contribution_roles.csv",

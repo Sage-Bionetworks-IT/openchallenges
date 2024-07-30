@@ -66,6 +66,15 @@
     "dev": {
         "VPC_CIDR": "10.255.92.0/24",
         "DNS_NAMESPACE": "openchallenges.io"
-      }
+      },
+    "secrets": {
+        "MARIADB_PASSWORD": "/openchallenges/MARIADB_PASSWORD",
+        "MARIADB_ROOT_PASSWORD": "/openchallenges/MARIADB_ROOT_PASSWORD",
+        "GIT_HOST_KEY": "/openchallenges/GIT_HOST_KEY",
+        "GIT_PRIVATE_KEY": "/openchallenges/GIT_PRIVATE_KEY",
+        "AWS_LOADER_S3_ACCESS_KEY_ID": "/openchallenges/AWS_LOADER_S3_ACCESS_KEY_ID",
+        "AWS_LOADER_S3_SECRET_ACCESS_KEY": "/openchallenges/AWS_LOADER_S3_SECRET_ACCESS_KEY",
+        "SECURITY_KEY": "/openchallenges/SECURITY_KEY"
+    }
   }
 }
