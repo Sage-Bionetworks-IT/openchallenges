@@ -169,6 +169,8 @@ load secrets from AWS SSM parameter store:
 SECRETS=ssm cdk synth
 ```
 
+__NOTE__: setting `SECRETS=ssm` requires access to an AWS account
+
 ## Override secrets from command line
 
 The CDK CLI allows overriding context variables:
