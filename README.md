@@ -73,7 +73,7 @@ automatically run on every commit.  Alternatively you can manually
 execute the validations by running `pre-commit run --all-files`.
 
 Verify CDK to Cloudformation conversion by running [cdk synth]:
-```text
+```commandline
 cdk synth
 ```
 The Cloudformation output is saved to the `cdk.out` folder
@@ -191,6 +191,6 @@ SECRETS=ssm cdk --context  "secrets"='{"MARIADB_PASSWORD": "/test/mariadb-root-p
 Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) then executing the
 following command:
 
-```text
+```commandline
 AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> ENV=dev SECRETS=ssm cdk deploy --all
 ```

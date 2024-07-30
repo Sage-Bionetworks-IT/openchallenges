@@ -7,8 +7,8 @@ from os import environ
 
 def get_environment() -> str:
     """
-    The `env` environment variable's value represents the deployment
-    environment (dev, prod, etc..).  This method gets the `env`
+    The `ENV` environment variable's value represents the deployment
+    environment (dev, prod, etc..).  This method gets the `ENV`
     environment variable's value
     """
     VALID_ENVS = ["dev", "prod"]
@@ -30,7 +30,10 @@ def get_environment() -> str:
 def get_secrets_location() -> dict:
     """
     The application's secrets can be saved in two places, the AWS parameter store
-    or on in the cdk.json file as a `context` value.
+    or directly in the cdk.json file as a `context` value.  This method returns
+    information on the location where secrets are stored.
+    * `local` - stored in cdk.json file
+    * `ssm` - stored in AWS SSM parameter store
     """
     VALID_LOCATIONS = ["local", "ssm"]
     secrets_environment_var = environ.get("SECRETS")
@@ -50,6 +53,24 @@ def get_secrets_location() -> dict:
 def get_ssm_secrets(param_store_secret_refs: dict) -> dict:
     """
     Retrieve secrets from the AWS SSM parameter store.
+
+    param_store_secret_refs is a dictionary that contains the key/ssm param name
+    for each secret.
+
+    Example param_store_secret_refs:
+    {
+        "MARIADB_PASSWORD": "/openchallenges/MARIADB_PASSWORD",
+        "GIT_PRIVATE_KEY": "/openchallenges/GIT_PRIVATE_KEY"
+    }
+
+    Retrieve from SSM parameter store "/openchallenges/MARIADB_PASSWORD" and assign it to MARIADB_PASSWORD
+    Retrieve from SSM parameter store "/openchallenges/GIT_PRIVATE_KEY" and assign it to GIT_PRIVATE_KEY
+
+    Example returned value:
+    {
+        "MARIADB_PASSWORD": "123ABC"
+        "GIT_PRIVATE_KEY": "-----BEGIN OPENSSH PRIVATE KEY-----123..ABC-----END OPENSSH PRIVATE KEY-----"
+    }
     """
     ssm = boto3.client("ssm")
     secrets = {}
@@ -70,7 +91,8 @@ def get_secrets(app: cdk.App) -> dict:
     Secrets can be stored in the following locations:
       1. Directly in the cdk.json file in a `secrets` context
       2. In the AWS SSM parameter store
-    Retrieve secrets from one of those locations.
+    Retrieve secrets from one of those locations using the context value from the ENV
+    environment value and from the cdk.json context value.
     """
     secrets_location = get_secrets_location()
     if secrets_location == "local":
