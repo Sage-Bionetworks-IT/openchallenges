@@ -198,6 +198,8 @@ challenge_service_props = ServiceProps(
         "DB_CATEGORIES_CSV_PATH": "/workspace/BOOT-INF/classes/db/categories.csv",
         "DB_EDAM_CONCEPT_CSV_PATH": "/workspace/BOOT-INF/classes/db/edam_concept.csv",
         "OPENCHALLENGES_CHALLENGE_SERVICE_IS_DEPLOYED_ON_AWS": "true",
+        "EUREKA_INSTANCE_NON_SECURE_PORT_ENABLED": "true",
+        "EUREKA_INSTANCE_NON_SECURE_PORT": "8085",
     },
 )
 
@@ -230,6 +232,8 @@ organization_service_props = ServiceProps(
         "DB_ORGANIZATIONS_CSV_PATH": "/workspace/BOOT-INF/classes/db/organizations.csv",
         "DB_CONTRIBUTION_ROLES_CSV_PATH": "/workspace/BOOT-INF/classes/db/contribution_roles.csv",
         "OPENCHALLENGES_ORGANIZATION_SERVICE_IS_DEPLOYED_ON_AWS": "true",
+        "EUREKA_INSTANCE_NON_SECURE_PORT_ENABLED": "true",
+        "EUREKA_INSTANCE_NON_SECURE_PORT": "8084",
     },
 )
 
