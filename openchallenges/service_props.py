@@ -1,3 +1,6 @@
+CONTAINER_LOCATION_PATH_ID = "path://"
+
+
 class ServiceProps:
     """
     ECS service properties
@@ -23,5 +26,9 @@ class ServiceProps:
         self.container_name = container_name
         self.container_port = container_port
         self.container_memory = container_memory
+        if CONTAINER_LOCATION_PATH_ID in container_location:
+            container_location = container_location.removeprefix(
+                CONTAINER_LOCATION_PATH_ID
+            )
         self.container_location = container_location
         self.container_env_vars = container_env_vars

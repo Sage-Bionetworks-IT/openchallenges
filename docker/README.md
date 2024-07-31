@@ -1,5 +1,7 @@
 # Build and push to docker
 
+This folder contains docker containers that can be built and integrated with the infrastructure
+deployment.
 
 ## Build and Tag docker image
 ```
@@ -46,4 +48,16 @@ AWS_PROFILE=itsandbox-admin AWS_DEFAULT_REGION=us-east-1 aws ecr create-reposito
 push container to ECR:
 ```
  AWS_PROFILE=itsandbox-admin AWS_DEFAULT_REGION=us-east-1 docker push 804034162148.dkr.ecr.us-east-1.amazonaws.com/service-one
+```
+
+
+### Reference container with CDK
+
+Use the [ECS from_asset method](https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_ecs/ContainerImage.html#aws_cdk.aws_ecs.ContainerImage.from_asset)
+to build and use the container image when running `cdk synth`
+
+```python
+from aws_cdk import aws_ecs as ecs
+
+ecs.ContainerImage.from_asset("docker/service-one")
 ```
