@@ -73,7 +73,7 @@ automatically run on every commit.  Alternatively you can manually
 execute the validations by running `pre-commit run --all-files`.
 
 Verify CDK to Cloudformation conversion by running [cdk synth]:
-```commandline
+```console
 cdk synth
 ```
 The Cloudformation output is saved to the `cdk.out` folder
@@ -108,7 +108,7 @@ Set an environment in cdk.json in `context` section of cdk.json:
 
 For example, using the `prod` environment:
 
-```commandline
+```console
 ENV=prod cdk synth
 ```
 
@@ -163,18 +163,15 @@ Set the `SECRETS` environment variable to specify the location where secrets sho
 
 Load secrets directly from cdk.json file:
 
-```commandline
+```console
 SECRETS=local cdk synth
 ```
 
 Load secrets from AWS SSM parameter store:
 
-```commandline
-AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 SECRETS=ssm cdk synth
+```console
+AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=us-east-1 SECRETS=ssm cdk synth
 ```
-
-where the value of `AWS_PROFILE` should match the value of the AWS CLI profile that you have
-previously created.
 
 > [!NOTE]
 > Setting `SECRETS=ssm` requires access to an AWS account
@@ -184,22 +181,23 @@ previously created.
 The CDK CLI allows overriding context variables:
 
 To load secrets directly from passed in values:
-```commandline
+
+```console
 SECRETS=local cdk --context  secrets='{"MARIADB_PASSWORD": "Dummy", "MARIADB_ROOT_PASSWORD": "Dummy", ..}' synth
 ```
 
 To load secrets from SSM parameter store with overridden SSM parameter names:
-```commandline
+
+```console
 SECRETS=ssm cdk --context  "secrets"='{"MARIADB_PASSWORD": "/test/mariadb-root-pass", "MARIADB_ROOT_PASSWORD": "/test/mariadb-root-pass", ..}' synth
 ```
-
 
 # Deployment
 
 Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) then executing the
 following command:
 
-```commandline
+```console
 AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> ENV=dev SECRETS=ssm cdk deploy --all
 ```
 
