@@ -194,3 +194,14 @@ following command:
 ```commandline
 AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> ENV=dev SECRETS=ssm cdk deploy --all
 ```
+
+
+# Access Container
+
+Once a container has been deployed successfully it is accessible for debugging using the
+[ECS execute-command](https://docs.aws.amazon.com/cli/latest/reference/ecs/execute-command.html)
+
+Example to get an interactive shell run into a container:
+```shell
+AWS_PROFILE=my-aws-profile aws ecs execute-command --cluster OpenChallengesEcs-ClusterEB0386A7-BygXkQgSvdjY  --task a2916461f65747f390fd3e29f1b387d8  --container opcenchallenges-mariadb  --command "/bin/sh" --interactive
+```
