@@ -1,0 +1,45 @@
+name: deploy
+
+on:
+  workflow_run:
+    workflows:
+      - check
+    types:
+      - completed
+    branches:
+      - dev
+
+# Ensures that only one deploy task per branch/environment will run at a time.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cdk-deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          role-to-assume: 'arn:aws:iam::804034162148:role/sagebase-github-oidc-openchallenges-deploy'
+          role-session-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
+          role-duration-seconds: 1200
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: CDK deploy
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy'
+          actions_comment: false
+          debug_log: true
+          cdk_args: '--all --require-approval never'
+        env:
+          ENV: ${{ github.head_ref || github.ref_name }}
+          SECRETS: "ssm"
