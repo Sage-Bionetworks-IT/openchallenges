@@ -86,6 +86,7 @@ Tests are available in the tests folder. Execute the following to run tests:
 python -m pytest tests/ -s -v
 ```
 
+
 # Environments
 
 Deployment context is set in the [cdk.json](cdk.json) file.  An `ENV` environment variable must be set to
@@ -111,6 +112,7 @@ For example, using the `prod` environment:
 ```console
 ENV=prod cdk synth
 ```
+
 
 # Secrets
 
