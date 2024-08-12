@@ -106,12 +106,11 @@ Set an environment in cdk.json in `context` section of cdk.json:
   }
 ```
 
-Use `prod` environment:
+For example, using the `prod` environment:
 
 ```commandline
 ENV=prod cdk synth
 ```
-
 
 # Secrets
 
@@ -119,7 +118,7 @@ Secrets can be stored in one of the following locations:
   * AWS SSM parameter store
   * Local context in [cdk.json](cdk.json) file
 
-## Loading directly from cdk.json:
+## Loading directly from cdk.json
 
 Set secrets directly in cdk.json in `context` section of cdk.json:
 
@@ -137,9 +136,10 @@ Set secrets directly in cdk.json in `context` section of cdk.json:
   }
 ```
 
-## Loading from ssm parameter store:
+## Loading from ssm parameter store
 
 Set secrets to the SSM parameter names in `context` section of cdk.json:
+
 ```text
   "context": {
     "secrets": {
@@ -154,9 +154,11 @@ Set secrets to the SSM parameter names in `context` section of cdk.json:
   }
 ```
 
-__NOT__: The SSM parameter names contain the secret values
+where the values of these KVs (e.g. `/openchallenges/MARIADB_PASSWORD`) refer to SSM parameters that
+must be created manually.
 
 ## Specify secret location
+
 Set the `SECRETS` environment variable to specify the location where secrets should be loaded from.
 
 load secrets directly from cdk.json file:
@@ -169,7 +171,8 @@ load secrets from AWS SSM parameter store:
 SECRETS=ssm cdk synth
 ```
 
-__NOTE__: setting `SECRETS=ssm` requires access to an AWS account
+> [!NOTE]
+> Setting `SECRETS=ssm` requires access to an AWS account
 
 ## Override secrets from command line
 
