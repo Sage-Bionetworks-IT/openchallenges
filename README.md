@@ -161,15 +161,20 @@ must be created manually.
 
 Set the `SECRETS` environment variable to specify the location where secrets should be loaded from.
 
-load secrets directly from cdk.json file:
+Load secrets directly from cdk.json file:
+
 ```commandline
 SECRETS=local cdk synth
 ```
 
-load secrets from AWS SSM parameter store:
+Load secrets from AWS SSM parameter store:
+
 ```commandline
-SECRETS=ssm cdk synth
+AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 SECRETS=ssm cdk synth
 ```
+
+where the value of `AWS_PROFILE` should match the value of the AWS CLI profile that you have
+previously created.
 
 > [!NOTE]
 > Setting `SECRETS=ssm` requires access to an AWS account
