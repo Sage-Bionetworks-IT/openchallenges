@@ -24,6 +24,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Install AWS CLI
+        run: sudo snap install aws-cli --classic
+      - name: Install AWS CDK CLI
+        run: npm install -g aws-cdk
+      - name: Install python dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
       - name: Assume AWS Role
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -31,12 +37,6 @@ jobs:
           role-to-assume: 'arn:aws:iam::804034162148:role/sagebase-github-oidc-openchallenges-deploy'
           role-session-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
           role-duration-seconds: 1200
-      - name: Install AWS CLI
-        run: sudo snap install aws-cli --classic
-      - name: Install AWS CDK CLI
-        run: npm install -g aws-cdk
-      - name: Install python dependencies
-        run: pip install -r requirements.txt -r requirements-dev.txt
       - name: CDK deploy
         run: cdk deploy --all --require-approval never
         env:
