@@ -34,12 +34,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
       - name: CDK deploy
-        uses: youyo/aws-cdk-github-actions@v2
-        with:
-          cdk_subcommand: 'deploy'
-          actions_comment: false
-          debug_log: true
-          cdk_args: '--all --require-approval never'
+        run: cdk deploy --all --require-approval never
         env:
           ENV: ${{ github.head_ref || github.ref_name }}
           SECRETS: "ssm"
