@@ -1,5 +1,5 @@
 {
-  "name": "Node.js & Python Development Environment",
+  "name": "AWS CDK & Python Development Environment",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
   "features": {
     "ghcr.io/devcontainers/features/node:1.5.0": {
@@ -10,5 +10,6 @@
     },
     "ghcr.io/devcontainers/features/aws-cli:1": {}
   },
-  "postCreateCommand": "npm install -g aws-cdk@2.151.0"
+  "postCreateCommand": "npm install -g aws-cdk@2.151.0",
+  "shutdownAction": "stopContainer"
 }
