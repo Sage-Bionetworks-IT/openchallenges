@@ -1,6 +1,7 @@
 
-# openchallenges
-OpenChallenges (OC) is a centralized hub for biomedical challenges
+# OpenChallenges AWS CDK app
+
+AWS CDK app for deploying [OpenChallenges](https://openchallenges.io/).
 
 # Perequisites
 
@@ -8,7 +9,29 @@ AWS CDK projects require some bootstrapping before synthesis or deployment.
 Please review the [bootstapping documentation](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_bootstrap)
 before development.
 
+# Dev Container
+
+This repository provides a [dev container](https://containers.dev/) that includes all the tools
+required to develop this AWS CDK app.
+
+## Opening the project inside its dev container
+
+With VS Code:
+
+1. Clone this repo
+2. File > Open Folder...
+3. A prompt should invite you to open the project inside the dev container. If not, open VS Code
+    Command Palette and select "Dev Containers: Open Folder in Container..."
+
+With GitHub Codespaces:
+
+1. From the main page of this repository, click on the button "Code" > Codespaces > Click on the
+   button "Create codespace"
+
+That's it! You are now inside the dev container and have access to all the development tools.
+
 # Development
+
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 This project is set up like a standard Python project.  The initialization
@@ -65,6 +88,7 @@ command.
 # Testing
 
 ## Static Analysis
+
 As a pre-deployment step we syntatically validate the CDK json, yaml and
 python files with [pre-commit](https://pre-commit.com).
 
@@ -73,9 +97,11 @@ automatically run on every commit.  Alternatively you can manually
 execute the validations by running `pre-commit run --all-files`.
 
 Verify CDK to Cloudformation conversion by running [cdk synth]:
-```commandline
+
+```console
 cdk synth
 ```
+
 The Cloudformation output is saved to the `cdk.out` folder
 
 ## Unit Tests
@@ -86,14 +112,15 @@ Tests are available in the tests folder. Execute the following to run tests:
 python -m pytest tests/ -s -v
 ```
 
+
 # Environments
 
-Deployment context is set in the [cdk.json](cdk.json) file.  An `ENV` environment variable must be set to
-tell the CDK which environment's variables to use when synthesising or deploying the stacks.
+Deployment context is set in the [cdk.json](cdk.json) file.  An `ENV` environment variable must be
+set to tell the CDK which environment's variables to use when synthesising or deploying the stacks.
 
 Set an environment in cdk.json in `context` section of cdk.json:
 
-```text
+```json
   "context": {
     "dev": {
         "VPC_CIDR": "10.255.92.0/24",
@@ -106,9 +133,9 @@ Set an environment in cdk.json in `context` section of cdk.json:
   }
 ```
 
-Use `prod` environment:
+For example, using the `prod` environment:
 
-```commandline
+```console
 ENV=prod cdk synth
 ```
 
@@ -119,7 +146,7 @@ Secrets can be stored in one of the following locations:
   * AWS SSM parameter store
   * Local context in [cdk.json](cdk.json) file
 
-## Loading directly from cdk.json:
+## Loading directly from cdk.json
 
 Set secrets directly in cdk.json in `context` section of cdk.json:
 
@@ -137,9 +164,10 @@ Set secrets directly in cdk.json in `context` section of cdk.json:
   }
 ```
 
-## Loading from ssm parameter store:
+## Loading from ssm parameter store
 
 Set secrets to the SSM parameter names in `context` section of cdk.json:
+
 ```text
   "context": {
     "secrets": {
@@ -154,44 +182,50 @@ Set secrets to the SSM parameter names in `context` section of cdk.json:
   }
 ```
 
-__NOT__: The SSM parameter names contain the secret values
+where the values of these KVs (e.g. `/openchallenges/MARIADB_PASSWORD`) refer to SSM parameters that
+must be created manually.
 
 ## Specify secret location
+
 Set the `SECRETS` environment variable to specify the location where secrets should be loaded from.
 
-load secrets directly from cdk.json file:
-```commandline
+Load secrets directly from cdk.json file:
+
+```console
 SECRETS=local cdk synth
 ```
 
-load secrets from AWS SSM parameter store:
-```commandline
-SECRETS=ssm cdk synth
+Load secrets from AWS SSM parameter store:
+
+```console
+AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=us-east-1 SECRETS=ssm cdk synth
 ```
 
-__NOTE__: setting `SECRETS=ssm` requires access to an AWS account
+> [!NOTE]
+> Setting `SECRETS=ssm` requires access to an AWS account
 
 ## Override secrets from command line
 
 The CDK CLI allows overriding context variables:
 
 To load secrets directly from passed in values:
-```commandline
+
+```console
 SECRETS=local cdk --context  secrets='{"MARIADB_PASSWORD": "Dummy", "MARIADB_ROOT_PASSWORD": "Dummy", ..}' synth
 ```
 
 To load secrets from SSM parameter store with overridden SSM parameter names:
-```commandline
+
+```console
 SECRETS=ssm cdk --context  "secrets"='{"MARIADB_PASSWORD": "/test/mariadb-root-pass", "MARIADB_ROOT_PASSWORD": "/test/mariadb-root-pass", ..}' synth
 ```
-
 
 # Deployment
 
 Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) then executing the
 following command:
 
-```commandline
+```console
 AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> ENV=dev SECRETS=ssm cdk deploy --all
 ```
 
@@ -202,6 +236,7 @@ Once a container has been deployed successfully it is accessible for debugging u
 [ECS execute-command](https://docs.aws.amazon.com/cli/latest/reference/ecs/execute-command.html)
 
 Example to get an interactive shell run into a container:
-```shell
+
+```console
 AWS_PROFILE=my-aws-profile aws ecs execute-command --cluster OpenChallengesEcs-ClusterEB0386A7-BygXkQgSvdjY  --task a2916461f65747f390fd3e29f1b387d8  --container opcenchallenges-mariadb  --command "/bin/sh" --interactive
 ```
