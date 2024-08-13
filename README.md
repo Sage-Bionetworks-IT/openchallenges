@@ -1,6 +1,7 @@
 
-# openchallenges
-OpenChallenges (OC) is a centralized hub for biomedical challenges
+# OpenChallenges AWS CDK app
+
+AWS CDK app for deploying [OpenChallenges](https://openchallenges.io/).
 
 # Perequisites
 
@@ -8,7 +9,29 @@ AWS CDK projects require some bootstrapping before synthesis or deployment.
 Please review the [bootstapping documentation](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_bootstrap)
 before development.
 
+# Dev Container
+
+This repository provides a [dev container](https://containers.dev/) that includes all the tools
+required to develop this AWS CDK app.
+
+## Opening the project inside its dev container
+
+With VS Code:
+
+1. Clone this repo
+2. File > Open Folder...
+3. A prompt should invite you to open the project inside the dev container. If not, open VS Code
+    Command Palette and select "Dev Containers: Open Folder in Container..."
+
+With GitHub Codespaces:
+
+1. From the main page of this repository, click on the button "Code" > Codespaces > Click on the
+   button "Create codespace"
+
+That's it! You are now inside the dev container and have access to all the development tools.
+
 # Development
+
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 This project is set up like a standard Python project.  The initialization
@@ -65,6 +88,7 @@ command.
 # Testing
 
 ## Static Analysis
+
 As a pre-deployment step we syntatically validate the CDK json, yaml and
 python files with [pre-commit](https://pre-commit.com).
 
@@ -73,9 +97,11 @@ automatically run on every commit.  Alternatively you can manually
 execute the validations by running `pre-commit run --all-files`.
 
 Verify CDK to Cloudformation conversion by running [cdk synth]:
+
 ```console
 cdk synth
 ```
+
 The Cloudformation output is saved to the `cdk.out` folder
 
 ## Unit Tests
@@ -89,12 +115,12 @@ python -m pytest tests/ -s -v
 
 # Environments
 
-Deployment context is set in the [cdk.json](cdk.json) file.  An `ENV` environment variable must be set to
-tell the CDK which environment's variables to use when synthesising or deploying the stacks.
+Deployment context is set in the [cdk.json](cdk.json) file.  An `ENV` environment variable must be
+set to tell the CDK which environment's variables to use when synthesising or deploying the stacks.
 
 Set an environment in cdk.json in `context` section of cdk.json:
 
-```text
+```json
   "context": {
     "dev": {
         "VPC_CIDR": "10.255.92.0/24",
@@ -210,6 +236,7 @@ Once a container has been deployed successfully it is accessible for debugging u
 [ECS execute-command](https://docs.aws.amazon.com/cli/latest/reference/ecs/execute-command.html)
 
 Example to get an interactive shell run into a container:
-```shell
+
+```console
 AWS_PROFILE=my-aws-profile aws ecs execute-command --cluster OpenChallengesEcs-ClusterEB0386A7-BygXkQgSvdjY  --task a2916461f65747f390fd3e29f1b387d8  --container opcenchallenges-mariadb  --command "/bin/sh" --interactive
 ```
