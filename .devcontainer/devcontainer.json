@@ -1,0 +1,14 @@
+{
+  "name": "Node.js & Python Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1.5.0": {
+      "version": "22.6.0"
+    },
+    "ghcr.io/devcontainers/features/python:1.6.3": {
+      "version": "3.12.0"
+    },
+    "ghcr.io/devcontainers/features/aws-cli:1": {}
+  },
+  "postCreateCommand": "npm install -g aws-cdk@2.151.0"
+}
