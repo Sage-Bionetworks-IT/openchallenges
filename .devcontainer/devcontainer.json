@@ -10,9 +10,6 @@
     },
     "ghcr.io/devcontainers/features/aws-cli:1": {}
   },
-  "postCreateCommand": [
-    "pip install --user -U pre-commit && pre-commit install-hooks",
-    "npm install -g aws-cdk@2.151.0"
-  ],
+  "postCreateCommand": "npm install -g aws-cdk@2.151.0 && pip install --user -U pre-commit && git config --global --add safe.directory \"$PWD\" && pre-commit install-hooks",
   "shutdownAction": "stopContainer"
 }
