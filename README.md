@@ -32,38 +32,22 @@ That's it! You are now inside the dev container and have access to all the devel
 
 # Development
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+All the development tools are provided when developing inside the dev container
+(see above). These tools include Python, AWS CLI, AWS CDK CLI, etc. These tools
+also include a Python virtual environment where all the Python packages needed
+are already installed.
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+If you decide the develop outside of the dev container, some of the development
+tools can be installed by running:
 
-To manually create a virtualenv on MacOS and Linux:
-
-```
-$ python3 -m venv .venv
+```console
+./tools/setup.sh
 ```
 
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
+Development requires the activation of the Python virtual environment:
 
 ```
 $ source .venv/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .venv\Scripts\activate.bat
-```
-
-Once the virtualenv is activated, you can install the required dependencies.
-
-```
-$ pip install -r requirements.txt -r requirements-dev.txt
 ```
 
 At this point you can now synthesize the CloudFormation template for this code.
@@ -240,3 +224,4 @@ Example to get an interactive shell run into a container:
 ```console
 AWS_PROFILE=my-aws-profile aws ecs execute-command --cluster OpenChallengesEcs-ClusterEB0386A7-BygXkQgSvdjY  --task a2916461f65747f390fd3e29f1b387d8  --container opcenchallenges-mariadb  --command "/bin/sh" --interactive
 ```
+test\n
