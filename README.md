@@ -213,6 +213,14 @@ following command:
 AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> ENV=dev SECRETS=ssm cdk deploy --all
 ```
 
+## Force new deployment
+
+```
+AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 aws ecs update-service \
+  --cluster <cluster-name> \
+  --service <service-name> \
+  --force-new-deployment
+```
 
 # Access Container
 
