@@ -256,6 +256,9 @@ Once a container has been deployed successfully it is accessible for debugging u
 Example to get an interactive shell run into a container:
 
 ```console
-AWS_PROFILE=my-aws-profile aws ecs execute-command --cluster OpenChallengesEcs-ClusterEB0386A7-BygXkQgSvdjY  --task a2916461f65747f390fd3e29f1b387d8  --container opcenchallenges-mariadb  --command "/bin/sh" --interactive
+AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 aws ecs execute-command \
+  --cluster OpenChallengesEcs-ClusterEB0386A7-BygXkQgSvdjY \
+  --task a2916461f65747f390fd3e29f1b387d8 \
+  --container openchallenges-mariadb \
+  --command "/bin/sh" --interactive
 ```
-test\n
