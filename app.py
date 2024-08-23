@@ -256,6 +256,7 @@ api_gateway_props = ServiceProps(
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
         "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
         "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
+        "OPENCHALLENGES_API_GATEWAY_IS_DEPLOYED_ON_AWS": "true",
     },
 )
 
