@@ -182,7 +182,7 @@ SECRETS=local cdk synth
 Load secrets from AWS SSM parameter store:
 
 ```console
-AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=us-east-1 SECRETS=ssm cdk synth
+AWS_PROFILE=<your-aws-profile> AWS_DEFAULT_REGION=us-east-1 SECRETS=ssm cdk synth
 ```
 
 > [!NOTE]
@@ -206,6 +206,13 @@ SECRETS=ssm cdk --context  "secrets"='{"MARIADB_PASSWORD": "/test/mariadb-root-p
 
 
 # Login with the AWS CLI
+
+> [!NOTE]
+> This and the following sections assume that you are working in the AWS account
+> `org-sagebase-itsandbox` with the role `Developer` and that you are deploying
+> to the `us-east-1` region. If this assumption is correct, you should be able
+> to simply copy-paste the following commands, otherwise adapting the
+> configuration should be straightforward.
 
 Create the config file if it doesn't exist yet.
 
@@ -236,7 +243,7 @@ Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/
 following command:
 
 ```console
-AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> ENV=dev SECRETS=ssm cdk deploy --all
+AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 ENV=dev SECRETS=ssm cdk deploy --all
 ```
 
 ## Force new deployment
@@ -248,7 +255,7 @@ AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 aws ecs update-service \
   --force-new-deployment
 ```
 
-# Access Container
+# Execute a command from a container running on ECS
 
 Once a container has been deployed successfully it is accessible for debugging using the
 [ECS execute-command](https://docs.aws.amazon.com/cli/latest/reference/ecs/execute-command.html)
