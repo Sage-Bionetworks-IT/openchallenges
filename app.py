@@ -162,6 +162,7 @@ image_service_props = ServiceProps(
         "SERVER_PORT": "8086",
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
         "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
+        "OPENCHALLENGES_IMAGE_SERVICE_IS_DEPLOYED_ON_AWS": "true",
     },
 )
 
@@ -176,44 +177,42 @@ image_service_stack.add_dependency(service_registry_stack)
 image_service_stack.add_dependency(thumbor_stack)
 image_service_stack.add_dependency(zipkin_stack)
 
-# challenge_service_props = ServiceProps(
-#     "openchallenges-challenge-service",
-#     8085,
-#     1024,
-#     "ghcr.io/sage-bionetworks/openchallenges-challenge-service:edge",
-#     {
-#         "SERVER_PORT": "8085",
-#         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
-#         "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
-#         "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
-#         "SPRING_DATASOURCE_USERNAME": "maria",
-#         "SPRING_DATASOURCE_PASSWORD": secrets["MARIADB_PASSWORD"],
-#         "DB_URL": "jdbc:mysql://openchallenges-mariadb:3306/challenge_service?allowLoadLocalInfile=true",
-#         "DB_PLATFORMS_CSV_PATH": "/workspace/BOOT-INF/classes/db/platforms.csv",
-#         "DB_CHALLENGES_CSV_PATH": "/workspace/BOOT-INF/classes/db/challenges.csv",
-#         "DB_CONTRIBUTION_ROLES_CSV_PATH": "/workspace/BOOT-INF/classes/db/contribution_roles.csv",
-#         "DB_INCENTIVES_CSV_PATH": "/workspace/BOOT-INF/classes/db/incentives.csv",
-#         "DB_INPUT_DATA_TYPE_CSV_PATH": "/workspace/BOOT-INF/classes/db/input_data_type.csv",
-#         "DB_SUBMISSION_TYPES_CSV_PATH": "/workspace/BOOT-INF/classes/db/submission_types.csv",
-#         "DB_CATEGORIES_CSV_PATH": "/workspace/BOOT-INF/classes/db/categories.csv",
-#         "DB_EDAM_CONCEPT_CSV_PATH": "/workspace/BOOT-INF/classes/db/edam_concept.csv",
-#         "OPENCHALLENGES_CHALLENGE_SERVICE_IS_DEPLOYED_ON_AWS": "true",
-#         "EUREKA_INSTANCE_NON_SECURE_PORT_ENABLED": "true",
-#         "EUREKA_INSTANCE_NON_SECURE_PORT": "8085",
-#     },
-# )
-#
-# challenge_service_stack = ServiceStack(
-#     app,
-#     "openchallenges-challenge-service",
-#     network_stack.vpc,
-#     ecs_stack.cluster,
-#     challenge_service_props,
-# )
-# challenge_service_stack.add_dependency(service_registry_stack)
-# challenge_service_stack.add_dependency(mariadb_stack)
-# challenge_service_stack.add_dependency(elasticsearch_stack)
-# challenge_service_stack.add_dependency(zipkin_stack)
+challenge_service_props = ServiceProps(
+    "openchallenges-challenge-service",
+    8085,
+    1024,
+    "ghcr.io/sage-bionetworks/openchallenges-challenge-service:edge",
+    {
+        "SERVER_PORT": "8085",
+        "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
+        "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
+        "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
+        "SPRING_DATASOURCE_USERNAME": "maria",
+        "SPRING_DATASOURCE_PASSWORD": secrets["MARIADB_PASSWORD"],
+        "DB_URL": "jdbc:mysql://openchallenges-mariadb:3306/challenge_service?allowLoadLocalInfile=true",
+        "DB_PLATFORMS_CSV_PATH": "/workspace/BOOT-INF/classes/db/platforms.csv",
+        "DB_CHALLENGES_CSV_PATH": "/workspace/BOOT-INF/classes/db/challenges.csv",
+        "DB_CONTRIBUTION_ROLES_CSV_PATH": "/workspace/BOOT-INF/classes/db/contribution_roles.csv",
+        "DB_INCENTIVES_CSV_PATH": "/workspace/BOOT-INF/classes/db/incentives.csv",
+        "DB_INPUT_DATA_TYPE_CSV_PATH": "/workspace/BOOT-INF/classes/db/input_data_type.csv",
+        "DB_SUBMISSION_TYPES_CSV_PATH": "/workspace/BOOT-INF/classes/db/submission_types.csv",
+        "DB_CATEGORIES_CSV_PATH": "/workspace/BOOT-INF/classes/db/categories.csv",
+        "DB_EDAM_CONCEPT_CSV_PATH": "/workspace/BOOT-INF/classes/db/edam_concept.csv",
+        "OPENCHALLENGES_CHALLENGE_SERVICE_IS_DEPLOYED_ON_AWS": "true",
+    },
+)
+
+challenge_service_stack = ServiceStack(
+    app,
+    "openchallenges-challenge-service",
+    network_stack.vpc,
+    ecs_stack.cluster,
+    challenge_service_props,
+)
+challenge_service_stack.add_dependency(service_registry_stack)
+challenge_service_stack.add_dependency(mariadb_stack)
+challenge_service_stack.add_dependency(elasticsearch_stack)
+challenge_service_stack.add_dependency(zipkin_stack)
 
 
 organization_service_props = ServiceProps(
@@ -232,8 +231,6 @@ organization_service_props = ServiceProps(
         "DB_ORGANIZATIONS_CSV_PATH": "/workspace/BOOT-INF/classes/db/organizations.csv",
         "DB_CONTRIBUTION_ROLES_CSV_PATH": "/workspace/BOOT-INF/classes/db/contribution_roles.csv",
         "OPENCHALLENGES_ORGANIZATION_SERVICE_IS_DEPLOYED_ON_AWS": "true",
-        "EUREKA_INSTANCE_NON_SECURE_PORT_ENABLED": "true",
-        "EUREKA_INSTANCE_NON_SECURE_PORT": "8084",
     },
 )
 
@@ -259,6 +256,7 @@ api_gateway_props = ServiceProps(
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
         "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
         "KEYCLOAK_URL": "http://openchallenges-keycloak:8080",
+        "OPENCHALLENGES_API_GATEWAY_IS_DEPLOYED_ON_AWS": "true",
     },
 )
 
@@ -292,7 +290,7 @@ oc_app_stack = ServiceStack(
 )
 oc_app_stack.add_dependency(organization_service_stack)
 oc_app_stack.add_dependency(api_gateway_stack)
-# oc_app_stack.add_dependency(challenge_service_stack)
+oc_app_stack.add_dependency(challenge_service_stack)
 oc_app_stack.add_dependency(image_service_stack)
 
 # From AWS docs https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect-concepts-deploy.html

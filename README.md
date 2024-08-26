@@ -182,7 +182,7 @@ SECRETS=local cdk synth
 Load secrets from AWS SSM parameter store:
 
 ```console
-AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=us-east-1 SECRETS=ssm cdk synth
+AWS_PROFILE=<your-aws-profile> AWS_DEFAULT_REGION=us-east-1 SECRETS=ssm cdk synth
 ```
 
 > [!NOTE]
@@ -204,17 +204,58 @@ To load secrets from SSM parameter store with overridden SSM parameter names:
 SECRETS=ssm cdk --context  "secrets"='{"MARIADB_PASSWORD": "/test/mariadb-root-pass", "MARIADB_ROOT_PASSWORD": "/test/mariadb-root-pass", ..}' synth
 ```
 
+
+# Login with the AWS CLI
+
+> [!NOTE]
+> This and the following sections assume that you are working in the AWS account
+> `org-sagebase-itsandbox` with the role `Developer` and that you are deploying
+> to the `us-east-1` region. If this assumption is correct, you should be able
+> to simply copy-paste the following commands, otherwise adapting the
+> configuration should be straightforward.
+
+Create the config file if it doesn't exist yet.
+
+```console
+mkdir ~/.aws && touch ~/.aws/config
+```
+
+As a Developer working in Sage IT Sandbox AWS account, add the following profile to the config file.
+
+```ini
+[profile itsandbox-dev]
+sso_start_url = https://d-906769aa66.awsapps.com/start
+sso_region = us-east-1
+sso_account_id = 804034162148
+sso_role_name = Developer
+```
+
+Login with the AWS CLI:
+
+```console
+aws --profile itsandbox-dev sso login
+```
+
+
 # Deployment
 
 Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) then executing the
 following command:
 
 ```console
-AWS_PROFILE=<your AWS profile> AWS_DEFAULT_REGION=<your region> ENV=dev SECRETS=ssm cdk deploy --all
+AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 ENV=dev SECRETS=ssm cdk deploy --all
 ```
 
+## Force new deployment
 
-# Access Container
+```console
+AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 aws ecs update-service \
+  --cluster <cluster-name> \
+  --service <service-name> \
+  --force-new-deployment
+```
+
+# Execute a command from a container running on ECS
 
 Once a container has been deployed successfully it is accessible for debugging using the
 [ECS execute-command](https://docs.aws.amazon.com/cli/latest/reference/ecs/execute-command.html)
@@ -222,6 +263,9 @@ Once a container has been deployed successfully it is accessible for debugging u
 Example to get an interactive shell run into a container:
 
 ```console
-AWS_PROFILE=my-aws-profile aws ecs execute-command --cluster OpenChallengesEcs-ClusterEB0386A7-BygXkQgSvdjY  --task a2916461f65747f390fd3e29f1b387d8  --container opcenchallenges-mariadb  --command "/bin/sh" --interactive
+AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 aws ecs execute-command \
+  --cluster OpenChallengesEcs-ClusterEB0386A7-BygXkQgSvdjY \
+  --task a2916461f65747f390fd3e29f1b387d8 \
+  --container openchallenges-mariadb \
+  --command "/bin/sh" --interactive
 ```
-test\n
