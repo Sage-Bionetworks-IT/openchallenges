@@ -4,7 +4,8 @@ from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
 from openchallenges.ecs_stack import EcsStack
 from openchallenges.service_stack import ServiceStack
-from openchallenges.service_stack import LoadBalancedServiceStack
+from openchallenges.service_stack import LoadBalancedHttpServiceStack
+from openchallenges.service_stack import LoadBalancedHttpsServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps
 import openchallenges.utils as utils
@@ -308,7 +309,7 @@ api_docs_props = ServiceProps(
     "ghcr.io/sage-bionetworks/openchallenges-api-docs:edge",
     {"PORT": "8010"},
 )
-api_docs_stack = LoadBalancedServiceStack(
+api_docs_stack = LoadBalancedHttpServiceStack(
     app,
     "openchallenges-api-docs",
     network_stack.vpc,
@@ -338,7 +339,7 @@ apex_service_props = ServiceProps(
     },
 )
 
-apex_service_stack = LoadBalancedServiceStack(
+apex_service_stack = LoadBalancedHttpsServiceStack(
     app,
     "openchallenges-apex",
     network_stack.vpc,
@@ -347,7 +348,7 @@ apex_service_stack = LoadBalancedServiceStack(
     load_balancer_stack.alb,
     80,
     "/health",
-    5,
+    health_check_interval=5,
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)
