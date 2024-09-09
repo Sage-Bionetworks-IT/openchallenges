@@ -205,17 +205,21 @@ class LoadBalancedHttpsServiceStack(ServiceStack):
             self, "Cert", certificate_arn=CERTIFICATE_ARN
         )
 
-        http_listener = elbv2.ApplicationListener(
+        # -------------------------------
+        # Setup https
+        # -------------------------------
+        https_listener = elbv2.ApplicationListener(
             self,
-            "HttpListener",
+            "HttpsListener",
             load_balancer=load_balancer,
-            port=listener_port,
+            port=ALB_HTTPS_LISTENER_PORT,
             open=True,
-            protocol=elbv2.ApplicationProtocol.HTTP,
+            protocol=elbv2.ApplicationProtocol.HTTPS,
+            certificates=[self.cert],
         )
 
-        http_listener.add_targets(
-            "HttpTarget",
+        https_listener.add_targets(
+            "HttpsTarget",
             port=props.container_port,
             protocol=elbv2.ApplicationProtocol.HTTP,
             targets=[self.service],
@@ -225,31 +229,21 @@ class LoadBalancedHttpsServiceStack(ServiceStack):
         )
 
         # -------------------------------
-        # Enable https and redirect http to https
+        # redirect http to https
         # -------------------------------
-
-        # http_listener.add_action(
-        #     "Redirect",
-        #     action=elbv2.ListenerAction.redirect(
-        #         port=str(ALB_HTTP_LISTENER_PORT),
-        #         protocol=(elbv2.ApplicationProtocol.HTTPS).value,
-        #         # permanent=True
-        #     )
-        # )
-        #
-        # https_listener = elbv2.ApplicationListener(
-        #     self,
-        #     "HttpsListener",
-        #     load_balancer=load_balancer,
-        #     port=ALB_HTTPS_LISTENER_PORT,
-        #     open=True,
-        #     protocol=elbv2.ApplicationProtocol.HTTPS,
-        #     certificates=[self.cert]
-        # )
-        #
-        # https_listener.add_targets(
-        #     "Target",
-        #     port=props.container_port,
-        #     protocol=elbv2.ApplicationProtocol.HTTP,
-        #     targets=[self.service],
-        # )
+        http_listener = elbv2.ApplicationListener(
+            self,
+            "HttpListener",
+            load_balancer=load_balancer,
+            port=ALB_HTTP_LISTENER_PORT,
+            open=True,
+            protocol=elbv2.ApplicationProtocol.HTTP,
+        )
+        http_listener.add_action(
+            "HttpRedirect",
+            action=elbv2.ListenerAction.redirect(
+                port=str(ALB_HTTPS_LISTENER_PORT),
+                protocol=(elbv2.ApplicationProtocol.HTTPS).value,
+                permanent=True,
+            ),
+        )
