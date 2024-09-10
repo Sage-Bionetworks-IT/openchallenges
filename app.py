@@ -348,6 +348,6 @@ apex_service_stack = LoadBalancedHttpsServiceStack(
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)
-
+apex_service_stack.add_dependency(load_balancer_stack)
 
 app.synth()

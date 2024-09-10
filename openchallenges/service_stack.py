@@ -119,7 +119,7 @@ class ServiceStack(cdk.Stack):
 
 class LoadBalancedHttpServiceStack(ServiceStack):
     """
-    A special stack to create a ECS service fronted by a load balancer. This allows us to split up
+    A special stack to create an ECS service fronted by a load balancer. This allows us to split up
     the ECS services and the load balancer into separate stacks.  It makes maintaining the stacks
     easier.  Unfortunately, due to the way AWS works, setting up a load balancer and ECS service
     in different stacks may cause cyclic references.
@@ -144,13 +144,6 @@ class LoadBalancedHttpServiceStack(ServiceStack):
     ) -> None:
         super().__init__(scope, construct_id, vpc, cluster, props, **kwargs)
 
-        # -------------------
-        # ACM Certificate for HTTPS
-        # -------------------
-        self.cert = acm.Certificate.from_certificate_arn(
-            self, "Cert", certificate_arn=CERTIFICATE_ARN
-        )
-
         http_listener = elbv2.ApplicationListener(
             self,
             "HttpListener",
@@ -173,7 +166,7 @@ class LoadBalancedHttpServiceStack(ServiceStack):
 
 class LoadBalancedHttpsServiceStack(ServiceStack):
     """
-    A special stack to create a ECS service fronted by a load balancer. This allows us to split up
+    A special stack to create an ECS service fronted by a load balancer. This allows us to split up
     the ECS services and the load balancer into separate stacks.  It makes maintaining the stacks
     easier.  Unfortunately, due to the way AWS works, setting up a load balancer and ECS service
     in different stacks may cause cyclic references.
@@ -239,6 +232,7 @@ class LoadBalancedHttpsServiceStack(ServiceStack):
             open=True,
             protocol=elbv2.ApplicationProtocol.HTTP,
         )
+
         http_listener.add_action(
             "HttpRedirect",
             action=elbv2.ListenerAction.redirect(
