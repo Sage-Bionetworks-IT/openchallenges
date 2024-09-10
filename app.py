@@ -275,9 +275,9 @@ oc_app_props = ServiceProps(
     1024,
     "ghcr.io/sage-bionetworks/openchallenges-app:edge",
     {
-        "API_DOCS_URL": "http://opench-applo-0n9hz4aps1ms-1653316793.us-east-1.elb.amazonaws.com/api-docs",
+        "API_DOCS_URL": "https://newinfra.openchallenges.io/api-docs",
         "APP_VERSION": "1.0.0-alpha",
-        "CSR_API_URL": "http://opench-applo-0n9hz4aps1ms-1653316793.us-east-1.elb.amazonaws.com/api/v1",
+        "CSR_API_URL": "https://newinfra.openchallenges.io/api/v1",
         "DATA_UPDATED_ON": "2023-09-26",
         "ENVIRONMENT": "production",
         "GOOGLE_TAG_MANAGER_ID": "",
