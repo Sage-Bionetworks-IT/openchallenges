@@ -65,7 +65,8 @@
     "@aws-cdk/aws-eks:nodegroupNameAttribute": true,
     "dev": {
         "VPC_CIDR": "10.255.92.0/24",
-        "DNS_NAMESPACE": "openchallenges.io"
+        "DNS_NAMESPACE": "openchallenges.io",
+        "DNS_SUBDOMAIN": "newinfra"
       },
     "secrets": {
         "MARIADB_PASSWORD": "/openchallenges/MARIADB_PASSWORD",
