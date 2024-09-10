@@ -4,7 +4,7 @@ from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
 from openchallenges.ecs_stack import EcsStack
 from openchallenges.service_stack import ServiceStack
-from openchallenges.service_stack import LoadBalancedServiceStack
+from openchallenges.service_stack import LoadBalancedHttpsServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps
 import openchallenges.utils as utils
@@ -275,9 +275,9 @@ oc_app_props = ServiceProps(
     1024,
     "ghcr.io/sage-bionetworks/openchallenges-app:edge",
     {
-        "API_DOCS_URL": "http://opench-applo-0n9hz4aps1ms-1653316793.us-east-1.elb.amazonaws.com/api-docs",
+        "API_DOCS_URL": "https://newinfra.openchallenges.io/api-docs",
         "APP_VERSION": "1.0.0-alpha",
-        "CSR_API_URL": "http://opench-applo-0n9hz4aps1ms-1653316793.us-east-1.elb.amazonaws.com/api/v1",
+        "CSR_API_URL": "https://newinfra.openchallenges.io/api/v1",
         "DATA_UPDATED_ON": "2023-09-26",
         "ENVIRONMENT": "production",
         "GOOGLE_TAG_MANAGER_ID": "",
@@ -308,15 +308,12 @@ api_docs_props = ServiceProps(
     "ghcr.io/sage-bionetworks/openchallenges-api-docs:edge",
     {"PORT": "8010"},
 )
-api_docs_stack = LoadBalancedServiceStack(
+api_docs_stack = ServiceStack(
     app,
     "openchallenges-api-docs",
     network_stack.vpc,
     ecs_stack.cluster,
     api_docs_props,
-    load_balancer_stack.alb,
-    8010,
-    health_check_interval=5,
 )
 
 apex_service_props = ServiceProps(
@@ -338,7 +335,7 @@ apex_service_props = ServiceProps(
     },
 )
 
-apex_service_stack = LoadBalancedServiceStack(
+apex_service_stack = LoadBalancedHttpsServiceStack(
     app,
     "openchallenges-apex",
     network_stack.vpc,
@@ -347,10 +344,10 @@ apex_service_stack = LoadBalancedServiceStack(
     load_balancer_stack.alb,
     80,
     "/health",
-    5,
+    health_check_interval=5,
 )
 apex_service_stack.add_dependency(oc_app_stack)
 apex_service_stack.add_dependency(api_docs_stack)
-
+apex_service_stack.add_dependency(load_balancer_stack)
 
 app.synth()
