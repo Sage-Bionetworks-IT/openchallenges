@@ -15,8 +15,6 @@ from openchallenges.service_props import ServiceProps
 
 ALB_HTTP_LISTENER_PORT = 80
 ALB_HTTPS_LISTENER_PORT = 443
-# manually created cert
-CERTIFICATE_ARN = "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
 
 
 class ServiceStack(cdk.Stack):
@@ -138,6 +136,7 @@ class LoadBalancedServiceStack(ServiceStack):
         props: ServiceProps,
         load_balancer: elbv2.ApplicationLoadBalancer,
         listener_port: int,
+        certificate_arn: str,
         health_check_path: str = "/",
         health_check_interval: int = 1,  # max is 5
         **kwargs,
@@ -148,7 +147,7 @@ class LoadBalancedServiceStack(ServiceStack):
         # ACM Certificate for HTTPS
         # -------------------
         self.cert = acm.Certificate.from_certificate_arn(
-            self, "Cert", certificate_arn=CERTIFICATE_ARN
+            self, "Cert", certificate_arn=certificate_arn
         )
 
         # -------------------------------

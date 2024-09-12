@@ -123,6 +123,19 @@ For example, using the `prod` environment:
 ENV=prod cdk synth
 ```
 
+# Certificates
+
+Certificates to set up HTTPS connections should be created manually in AWS certificate manager.
+This is not automated due to AWS requiring manual verification of the domain ownership.
+Once created take the ARN of the certificate and add it to a context in cdk.json.
+
+```json
+  "context": {
+    "dev": {
+      "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
+    }
+  }
+```
 
 # Secrets
 

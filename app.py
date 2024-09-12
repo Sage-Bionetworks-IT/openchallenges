@@ -19,6 +19,7 @@ env_vars = app.node.try_get_context(environment)
 dns_namespace = env_vars["DNS_NAMESPACE"]
 dns_sub_domain = env_vars["DNS_SUBDOMAIN"]
 vpc_cidr = env_vars["VPC_CIDR"]
+certificate_arn = env_vars["CERTIFICATE_ARN"]
 
 # get secrets from cdk.json or aws parameter store
 secrets = utils.get_secrets(app)
@@ -351,6 +352,7 @@ apex_service_stack = LoadBalancedServiceStack(
     apex_service_props,
     load_balancer_stack.alb,
     80,
+    certificate_arn,
     "/health",
     health_check_interval=5,
 )
