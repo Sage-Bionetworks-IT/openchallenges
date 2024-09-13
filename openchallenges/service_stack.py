@@ -15,8 +15,6 @@ from openchallenges.service_props import ServiceProps
 
 ALB_HTTP_LISTENER_PORT = 80
 ALB_HTTPS_LISTENER_PORT = 443
-# manually created cert
-CERTIFICATE_ARN = "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
 
 
 class ServiceStack(cdk.Stack):
@@ -117,7 +115,7 @@ class ServiceStack(cdk.Stack):
             )
 
 
-class LoadBalancedHttpServiceStack(ServiceStack):
+class LoadBalancedServiceStack(ServiceStack):
     """
     A special stack to create an ECS service fronted by a load balancer. This allows us to split up
     the ECS services and the load balancer into separate stacks.  It makes maintaining the stacks
@@ -138,53 +136,7 @@ class LoadBalancedHttpServiceStack(ServiceStack):
         props: ServiceProps,
         load_balancer: elbv2.ApplicationLoadBalancer,
         listener_port: int,
-        health_check_path: str = "/",
-        health_check_interval: int = 1,  # max is 5
-        **kwargs,
-    ) -> None:
-        super().__init__(scope, construct_id, vpc, cluster, props, **kwargs)
-
-        http_listener = elbv2.ApplicationListener(
-            self,
-            "HttpListener",
-            load_balancer=load_balancer,
-            port=listener_port,
-            open=True,
-            protocol=elbv2.ApplicationProtocol.HTTP,
-        )
-
-        http_listener.add_targets(
-            "HttpTarget",
-            port=props.container_port,
-            protocol=elbv2.ApplicationProtocol.HTTP,
-            targets=[self.service],
-            health_check=elbv2.HealthCheck(
-                path=health_check_path, interval=duration.minutes(health_check_interval)
-            ),
-        )
-
-
-class LoadBalancedHttpsServiceStack(ServiceStack):
-    """
-    A special stack to create an ECS service fronted by a load balancer. This allows us to split up
-    the ECS services and the load balancer into separate stacks.  It makes maintaining the stacks
-    easier.  Unfortunately, due to the way AWS works, setting up a load balancer and ECS service
-    in different stacks may cause cyclic references.
-    https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_ecs/README.html#using-a-load-balancer-from-a-different-stack
-
-    To work around this problem we use the "Split at listener" option from
-    https://github.com/aws-samples/aws-cdk-examples
-    """
-
-    def __init__(
-        self,
-        scope: Construct,
-        construct_id: str,
-        vpc: ec2.Vpc,
-        cluster: ecs.Cluster,
-        props: ServiceProps,
-        load_balancer: elbv2.ApplicationLoadBalancer,
-        listener_port: int,
+        certificate_arn: str,
         health_check_path: str = "/",
         health_check_interval: int = 1,  # max is 5
         **kwargs,
@@ -195,7 +147,7 @@ class LoadBalancedHttpsServiceStack(ServiceStack):
         # ACM Certificate for HTTPS
         # -------------------
         self.cert = acm.Certificate.from_certificate_arn(
-            self, "Cert", certificate_arn=CERTIFICATE_ARN
+            self, "Cert", certificate_arn=certificate_arn
         )
 
         # -------------------------------

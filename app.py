@@ -4,22 +4,31 @@ from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
 from openchallenges.ecs_stack import EcsStack
 from openchallenges.service_stack import ServiceStack
-from openchallenges.service_stack import LoadBalancedHttpsServiceStack
+from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps
 import openchallenges.utils as utils
 
 app = cdk.App()
 
+# get the environment
 environment = utils.get_environment()
+
+# get VARS from cdk.json
 env_vars = app.node.try_get_context(environment)
+dns_namespace = env_vars["DNS_NAMESPACE"]
+dns_sub_domain = env_vars["DNS_SUBDOMAIN"]
+vpc_cidr = env_vars["VPC_CIDR"]
+certificate_arn = env_vars["CERTIFICATE_ARN"]
+
+# get secrets from cdk.json or aws parameter store
 secrets = utils.get_secrets(app)
 
 bucket_stack = BucketStack(app, "openchallenges-buckets")
-network_stack = NetworkStack(app, "openchallenges-network", env_vars["VPC_CIDR"])
-ecs_stack = EcsStack(
-    app, "openchallenges-ecs", network_stack.vpc, env_vars["DNS_NAMESPACE"]
-)
+
+network_stack = NetworkStack(app, "openchallenges-network", vpc_cidr)
+
+ecs_stack = EcsStack(app, "openchallenges-ecs", network_stack.vpc, dns_namespace)
 
 mariadb_props = ServiceProps(
     "openchallenges-mariadb",
@@ -275,9 +284,9 @@ oc_app_props = ServiceProps(
     1024,
     "ghcr.io/sage-bionetworks/openchallenges-app:edge",
     {
-        "API_DOCS_URL": "https://newinfra.openchallenges.io/api-docs",
+        "API_DOCS_URL": f"https://{dns_sub_domain}.{dns_namespace}/api-docs",
         "APP_VERSION": "1.0.0-alpha",
-        "CSR_API_URL": "https://newinfra.openchallenges.io/api/v1",
+        "CSR_API_URL": f"https://{dns_sub_domain}.{dns_namespace}/api/v1",
         "DATA_UPDATED_ON": "2023-09-26",
         "ENVIRONMENT": "production",
         "GOOGLE_TAG_MANAGER_ID": "",
@@ -335,7 +344,7 @@ apex_service_props = ServiceProps(
     },
 )
 
-apex_service_stack = LoadBalancedHttpsServiceStack(
+apex_service_stack = LoadBalancedServiceStack(
     app,
     "openchallenges-apex",
     network_stack.vpc,
@@ -343,6 +352,7 @@ apex_service_stack = LoadBalancedHttpsServiceStack(
     apex_service_props,
     load_balancer_stack.alb,
     80,
+    certificate_arn,
     "/health",
     health_check_interval=5,
 )
