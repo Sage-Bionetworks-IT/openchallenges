@@ -65,8 +65,17 @@
     "@aws-cdk/aws-eks:nodegroupNameAttribute": true,
     "dev": {
         "VPC_CIDR": "10.255.92.0/24",
-        "DNS_NAMESPACE": "openchallenges.io",
-        "DNS_SUBDOMAIN": "newinfra",
+        "FQDN": "dev.openchallenges.io",
+        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
+      },
+    "stage": {
+        "VPC_CIDR": "10.255.92.0/24",
+        "FQDN": "stage.openchallenges.io",
+        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
+      },
+    "prod": {
+        "VPC_CIDR": "10.255.92.0/24",
+        "FQDN": "prod.openchallenges.io",
         "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
       },
     "secrets": {

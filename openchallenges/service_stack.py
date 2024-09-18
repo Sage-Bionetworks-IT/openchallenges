@@ -135,7 +135,6 @@ class LoadBalancedServiceStack(ServiceStack):
         cluster: ecs.Cluster,
         props: ServiceProps,
         load_balancer: elbv2.ApplicationLoadBalancer,
-        listener_port: int,
         certificate_arn: str,
         health_check_path: str = "/",
         health_check_interval: int = 1,  # max is 5

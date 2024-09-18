@@ -13,22 +13,25 @@ app = cdk.App()
 
 # get the environment
 environment = utils.get_environment()
+stack_name_prefix = f"openchallenges-{environment}"
 
 # get VARS from cdk.json
 env_vars = app.node.try_get_context(environment)
-dns_namespace = env_vars["DNS_NAMESPACE"]
-dns_sub_domain = env_vars["DNS_SUBDOMAIN"]
+fully_qualified_domain_name = env_vars["FQDN"]
+subdomain, domain = fully_qualified_domain_name.split(".", 1)
 vpc_cidr = env_vars["VPC_CIDR"]
 certificate_arn = env_vars["CERTIFICATE_ARN"]
 
 # get secrets from cdk.json or aws parameter store
 secrets = utils.get_secrets(app)
 
-bucket_stack = BucketStack(app, "openchallenges-buckets")
+bucket_stack = BucketStack(app, f"{stack_name_prefix}-buckets")
 
-network_stack = NetworkStack(app, "openchallenges-network", vpc_cidr)
+network_stack = NetworkStack(app, f"{stack_name_prefix}-network", vpc_cidr)
 
-ecs_stack = EcsStack(app, "openchallenges-ecs", network_stack.vpc, dns_namespace)
+ecs_stack = EcsStack(
+    app, f"{stack_name_prefix}-ecs", network_stack.vpc, fully_qualified_domain_name
+)
 
 mariadb_props = ServiceProps(
     "openchallenges-mariadb",
@@ -44,7 +47,11 @@ mariadb_props = ServiceProps(
 )
 
 mariadb_stack = ServiceStack(
-    app, "openchallenges-mariadb", network_stack.vpc, ecs_stack.cluster, mariadb_props
+    app,
+    f"{stack_name_prefix}-mariadb",
+    network_stack.vpc,
+    ecs_stack.cluster,
+    mariadb_props,
 )
 
 elasticsearch_props = ServiceProps(
@@ -66,7 +73,7 @@ elasticsearch_props = ServiceProps(
 
 elasticsearch_stack = ServiceStack(
     app,
-    "openchallenges-elasticsearch",
+    f"{stack_name_prefix}-elasticsearch",
     network_stack.vpc,
     ecs_stack.cluster,
     elasticsearch_props,
@@ -103,7 +110,11 @@ thumbor_props = ServiceProps(
 )
 
 thumbor_stack = ServiceStack(
-    app, "openchallenges-thumbor", network_stack.vpc, ecs_stack.cluster, thumbor_props
+    app,
+    f"{stack_name_prefix}-thumbor",
+    network_stack.vpc,
+    ecs_stack.cluster,
+    thumbor_props,
 )
 
 config_server_props = ServiceProps(
@@ -123,7 +134,7 @@ config_server_props = ServiceProps(
 
 config_server_stack = ServiceStack(
     app,
-    "openchallenges-config-server",
+    f"{stack_name_prefix}-config-server",
     network_stack.vpc,
     ecs_stack.cluster,
     config_server_props,
@@ -143,7 +154,7 @@ service_registry_props = ServiceProps(
 
 service_registry_stack = ServiceStack(
     app,
-    "openchallenges-service-registry",
+    f"{stack_name_prefix}-service-registry",
     network_stack.vpc,
     ecs_stack.cluster,
     service_registry_props,
@@ -159,7 +170,11 @@ zipkin_props = ServiceProps(
 )
 
 zipkin_stack = ServiceStack(
-    app, "openchallenges-zipkin", network_stack.vpc, ecs_stack.cluster, zipkin_props
+    app,
+    f"{stack_name_prefix}-zipkin",
+    network_stack.vpc,
+    ecs_stack.cluster,
+    zipkin_props,
 )
 
 image_service_props = ServiceProps(
@@ -177,7 +192,7 @@ image_service_props = ServiceProps(
 
 image_service_stack = ServiceStack(
     app,
-    "openchallenges-image-service",
+    f"{stack_name_prefix}-image-service",
     network_stack.vpc,
     ecs_stack.cluster,
     image_service_props,
@@ -213,7 +228,7 @@ challenge_service_props = ServiceProps(
 
 challenge_service_stack = ServiceStack(
     app,
-    "openchallenges-challenge-service",
+    f"{stack_name_prefix}-challenge-service",
     network_stack.vpc,
     ecs_stack.cluster,
     challenge_service_props,
@@ -245,7 +260,7 @@ organization_service_props = ServiceProps(
 
 organization_service_stack = ServiceStack(
     app,
-    "openchallenges-organization-service",
+    f"{stack_name_prefix}-organization-service",
     network_stack.vpc,
     ecs_stack.cluster,
     organization_service_props,
@@ -271,7 +286,7 @@ api_gateway_props = ServiceProps(
 
 api_gateway_stack = ServiceStack(
     app,
-    "openchallenges-api-gateway",
+    f"{stack_name_prefix}-api-gateway",
     network_stack.vpc,
     ecs_stack.cluster,
     api_gateway_props,
@@ -284,9 +299,9 @@ oc_app_props = ServiceProps(
     1024,
     "ghcr.io/sage-bionetworks/openchallenges-app:edge",
     {
-        "API_DOCS_URL": f"https://{dns_sub_domain}.{dns_namespace}/api-docs",
+        "API_DOCS_URL": f"https://{fully_qualified_domain_name}/api-docs",
         "APP_VERSION": "1.0.0-alpha",
-        "CSR_API_URL": f"https://{dns_sub_domain}.{dns_namespace}/api/v1",
+        "CSR_API_URL": f"https://{fully_qualified_domain_name}/api/v1",
         "DATA_UPDATED_ON": "2023-09-26",
         "ENVIRONMENT": "production",
         "GOOGLE_TAG_MANAGER_ID": "",
@@ -295,7 +310,7 @@ oc_app_props = ServiceProps(
 )
 
 oc_app_stack = ServiceStack(
-    app, "openchallenges-app", network_stack.vpc, ecs_stack.cluster, oc_app_props
+    app, f"{stack_name_prefix}-app", network_stack.vpc, ecs_stack.cluster, oc_app_props
 )
 oc_app_stack.add_dependency(organization_service_stack)
 oc_app_stack.add_dependency(api_gateway_stack)
@@ -307,7 +322,7 @@ oc_app_stack.add_dependency(image_service_stack)
 # client service. The services need to be created in this order to prevent an time period when the frontend
 # client service is running and available the public, but a backend isn't.
 load_balancer_stack = LoadBalancerStack(
-    app, "openchallenges-load-balancer", network_stack.vpc
+    app, f"{stack_name_prefix}-load-balancer", network_stack.vpc
 )
 
 api_docs_props = ServiceProps(
@@ -319,7 +334,7 @@ api_docs_props = ServiceProps(
 )
 api_docs_stack = ServiceStack(
     app,
-    "openchallenges-api-docs",
+    f"{stack_name_prefix}-api-docs",
     network_stack.vpc,
     ecs_stack.cluster,
     api_docs_props,
@@ -346,14 +361,13 @@ apex_service_props = ServiceProps(
 
 apex_service_stack = LoadBalancedServiceStack(
     app,
-    "openchallenges-apex",
+    f"{stack_name_prefix}-apex",
     network_stack.vpc,
     ecs_stack.cluster,
     apex_service_props,
     load_balancer_stack.alb,
-    80,
     certificate_arn,
-    "/health",
+    health_check_path="/health",
     health_check_interval=5,
 )
 apex_service_stack.add_dependency(oc_app_stack)
