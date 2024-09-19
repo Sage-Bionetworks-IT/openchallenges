@@ -66,17 +66,17 @@
     "dev": {
         "VPC_CIDR": "10.255.92.0/24",
         "FQDN": "dev.openchallenges.io",
-        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
+        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:221082174873:certificate/4bd9e6ac-0951-485e-a132-e842aaf2ec58"
       },
     "stage": {
-        "VPC_CIDR": "10.255.92.0/24",
+        "VPC_CIDR": "10.255.93.0/24",
         "FQDN": "stage.openchallenges.io",
-        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
+        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:766808016710:certificate/4e9c7a02-bd99-486a-a2ad-270a88676ae1"
       },
     "prod": {
-        "VPC_CIDR": "10.255.92.0/24",
+        "VPC_CIDR": "10.255.94.0/24",
         "FQDN": "prod.openchallenges.io",
-        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
+        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:766808016710:certificate/4e9c7a02-bd99-486a-a2ad-270a88676ae1"
       },
     "secrets": {
         "MARIADB_PASSWORD": "/openchallenges/MARIADB_PASSWORD",
