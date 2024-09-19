@@ -1,6 +1,6 @@
 import aws_cdk as cdk
 
-from aws_cdk import aws_s3 as s3, aws_iam as iam
+from aws_cdk import aws_s3 as s3
 
 from constructs import Construct
 
@@ -32,31 +32,4 @@ class BucketStack(cdk.Stack):
             self,
             "ImageBucketName",
             value=self.openchallenges_img_bucket.bucket_name,
-        )
-
-        # -------------------
-        # IAM user with access to the openchallenges bucket
-        # -------------------
-        self.s3_user = iam.User(self, "ThumborUser", user_name="openchallenges-thumbor")
-        # self.access_key = iam.AccessKey(self, "AccessKey", user=self.s3_user)
-        # secret = ssm.Secret(
-        #     self,
-        #     "SecretAccessKey",
-        #     secret_string_value=self.access_key.secret_access_key,
-        # )
-        # cdk.CfnOutput(self, "AccessKeyId", value=self.access_key.access_key_id)
-
-        self.s3_user.add_to_policy(
-            iam.PolicyStatement(
-                effect=iam.Effect.ALLOW,
-                resources=[self.openchallenges_img_bucket.bucket_arn],
-                actions=["s3:ListBucket", "s3:GetObject*"],
-            )
-        )
-        self.s3_user.add_to_policy(
-            iam.PolicyStatement(
-                effect=iam.Effect.ALLOW,
-                resources=[f"{self.openchallenges_img_bucket.bucket_arn}/*"],
-                actions=["s3:*Object"],
-            )
         )

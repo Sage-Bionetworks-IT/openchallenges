@@ -91,8 +91,6 @@ thumbor_props = ServiceProps(
         "LOADER": "thumbor_aws.loader",
         "AWS_LOADER_REGION_NAME": "us-east-1",
         "AWS_LOADER_BUCKET_NAME": bucket_stack.openchallenges_img_bucket.bucket_name,
-        "AWS_LOADER_S3_ACCESS_KEY_ID": secrets["AWS_LOADER_S3_ACCESS_KEY_ID"],
-        "AWS_LOADER_S3_SECRET_ACCESS_KEY": secrets["AWS_LOADER_S3_SECRET_ACCESS_KEY"],
         "AWS_LOADER_S3_ENDPOINT_URL": "http://s3.us-east-1.amazonaws.com",
         "AWS_LOADER_ROOT_PATH": "img",
         "STORAGE": "thumbor.storages.file_storage",
@@ -117,6 +115,7 @@ thumbor_stack = ServiceStack(
     ecs_stack.cluster,
     thumbor_props,
 )
+thumbor_stack.add_dependency(bucket_stack)
 
 config_server_props = ServiceProps(
     "openchallenges-config-server",
