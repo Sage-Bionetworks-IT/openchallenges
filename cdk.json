@@ -71,12 +71,12 @@
     "stage": {
         "VPC_CIDR": "10.255.93.0/24",
         "FQDN": "stage.openchallenges.io",
-        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:766808016710:certificate/4e9c7a02-bd99-486a-a2ad-270a88676ae1"
+        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:528757786185:certificate/d679947f-90ed-4a4b-9d49-e728af5ae546"
       },
     "prod": {
         "VPC_CIDR": "10.255.94.0/24",
         "FQDN": "prod.openchallenges.io",
-        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:766808016710:certificate/4e9c7a02-bd99-486a-a2ad-270a88676ae1"
+        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:528757786185:certificate/d679947f-90ed-4a4b-9d49-e728af5ae546"
       },
     "secrets": {
         "MARIADB_PASSWORD": "/openchallenges/MARIADB_PASSWORD",

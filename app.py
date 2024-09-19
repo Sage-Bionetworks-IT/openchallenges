@@ -32,6 +32,7 @@ network_stack = NetworkStack(app, f"{stack_name_prefix}-network", vpc_cidr)
 ecs_stack = EcsStack(
     app, f"{stack_name_prefix}-ecs", network_stack.vpc, fully_qualified_domain_name
 )
+ecs_stack.add_dependency(network_stack)
 
 mariadb_props = ServiceProps(
     "openchallenges-mariadb",
