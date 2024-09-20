@@ -8,6 +8,7 @@ from aws_cdk import (
     Size as size,
     aws_elasticloadbalancingv2 as elbv2,
     aws_certificatemanager as acm,
+    aws_iam as iam,
 )
 
 from constructs import Construct
@@ -33,12 +34,39 @@ class ServiceStack(cdk.Stack):
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        # allow containers default task access and s3 bucket access
+        task_role = iam.Role(
+            self,
+            "TaskRole",
+            assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
+            ],
+        )
+        task_role.add_to_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "logs:CreateLogStream",
+                    "logs:DescribeLogGroups",
+                    "logs:DescribeLogStreams",
+                    "logs:PutLogEvents",
+                    "ssmmessages:CreateControlChannel",
+                    "ssmmessages:CreateDataChannel",
+                    "ssmmessages:OpenControlChannel",
+                    "ssmmessages:OpenDataChannel",
+                ],
+                resources=["*"],
+                effect=iam.Effect.ALLOW,
+            )
+        )
+
         # ECS task with fargate
         self.task_definition = ecs.FargateTaskDefinition(
             self,
             "TaskDef",
             cpu=1024,
             memory_limit_mib=4096,
+            task_role=task_role,
         )
 
         image = ecs.ContainerImage.from_registry(props.container_location)
@@ -135,7 +163,6 @@ class LoadBalancedServiceStack(ServiceStack):
         cluster: ecs.Cluster,
         props: ServiceProps,
         load_balancer: elbv2.ApplicationLoadBalancer,
-        listener_port: int,
         certificate_arn: str,
         health_check_path: str = "/",
         health_check_interval: int = 1,  # max is 5

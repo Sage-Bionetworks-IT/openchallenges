@@ -8,10 +8,10 @@ from os import environ
 def get_environment() -> str:
     """
     The `ENV` environment variable's value represents the deployment
-    environment (dev, prod, etc..).  This method gets the `ENV`
+    environment (dev, stage, prod, etc..).  This method gets the `ENV`
     environment variable's value
     """
-    VALID_ENVS = ["dev", "prod"]
+    VALID_ENVS = ["dev", "stage", "prod"]
 
     env_environment_var = environ.get("ENV")
     if env_environment_var is None:

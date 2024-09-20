@@ -7,11 +7,6 @@ from aws_cdk import (
 
 from constructs import Construct
 
-ALB_HTTP_LISTENER_PORT = 80
-ALB_HTTPS_LISTENER_PORT = 443
-# manually created cert
-CERTIFICATE_ARN = "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
-
 
 class LoadBalancerStack(cdk.Stack):
     """

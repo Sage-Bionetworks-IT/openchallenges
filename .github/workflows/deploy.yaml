@@ -34,7 +34,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
-          role-to-assume: 'arn:aws:iam::804034162148:role/sagebase-github-oidc-openchallenges-deploy'
+          role-to-assume: 'arn:aws:iam::221082174873:role/sagebase-github-oidc-openchallenges-deploy'
           role-session-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
           role-duration-seconds: 1200
       - name: CDK deploy
