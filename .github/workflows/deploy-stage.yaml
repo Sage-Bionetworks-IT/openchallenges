@@ -15,5 +15,5 @@ jobs:
     with:
       role-to-assume: "arn:aws:iam::528757786185:role/sagebase-github-oidc-openchallenges-deploy"
       role-session-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
-      environment: ${{ github.head_ref || github.ref_name }}
+      environment: "stage"
       secrets-location: "ssm"
