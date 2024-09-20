@@ -282,3 +282,20 @@ AWS_PROFILE=itsandbox-dev AWS_DEFAULT_REGION=us-east-1 aws ecs execute-command \
   --container openchallenges-mariadb \
   --command "/bin/sh" --interactive
 ```
+
+
+# CI Workflow
+
+This repo has been set up to use Github Actions CI to continously deploy the
+OpenChallenges app.
+
+The workflow for continuous integration:
+
+* Create PR from the git dev branch
+* PR is reviewed and approved
+* PR is merged
+* CI deploys changes to the dev environment (dev.openchallenges.io) in the org-sagebase-openchallenges-dev account.
+* Changes are promoted (or merged) to the git stage branch.
+* CI deploys changes to the staging environment (stage.openchallenges.io) in the org-sagebase-openchallenges-prod account.
+* Changes are promoted (or merged) to the git prod branch.
+* CI deploys changes to the prod environment (prod.openchallenges.io) in the org-sagebase-openchallenges-prod account.
