@@ -108,12 +108,12 @@ Set an environment in cdk.json in `context` section of cdk.json:
   "context": {
     "dev": {
         "VPC_CIDR": "10.255.92.0/24",
-        "DNS_NAMESPACE": "openchallenges-dev.io"
-      },
+        "FQDN": "dev.openchallenges.io"
+    },
     "prod": {
-        "VPC_CIDR": "10.255.93.0/24",
-        "DNS_NAMESPACE": "openchallenges.io"
-      },
+        "VPC_CIDR": "10.255.94.0/24",
+        "FQDN": "prod.openchallenges.io"
+    },
   }
 ```
 
@@ -132,10 +132,12 @@ Once created take the ARN of the certificate and add it to a context in cdk.json
 ```json
   "context": {
     "dev": {
-      "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:804034162148:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
+      "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:XXXXXXXXX:certificate/76ed5a71-4aa8-4cc1-9db6-aa7a322ec077"
     }
   }
 ```
+
+![ACM certificate](docs/acm-certificate.png)
 
 # Secrets
 
@@ -182,6 +184,8 @@ Set secrets to the SSM parameter names in `context` section of cdk.json:
 where the values of these KVs (e.g. `/openchallenges/MARIADB_PASSWORD`) refer to SSM parameters that
 must be created manually.
 
+![AWS secrets manager](docs/aws-parameter-store.png)
+
 ## Specify secret location
 
 Set the `SECRETS` environment variable to specify the location where secrets should be loaded from.
@@ -217,8 +221,22 @@ To load secrets from SSM parameter store with overridden SSM parameter names:
 SECRETS=ssm cdk --context  "secrets"='{"MARIADB_PASSWORD": "/test/mariadb-root-pass", "MARIADB_ROOT_PASSWORD": "/test/mariadb-root-pass", ..}' synth
 ```
 
+# Deployment
 
-# Login with the AWS CLI
+## Bootstrap
+
+There are a few items that need to be manually bootstrapped before deploying the
+OpenChallenges application.
+
+* Add OC [secrets](#Secrets) to either the cdk.json or the AWS System Manager parameter store
+* Create an [ACM certificate for the application](#Certificates) using the AWS Certificates Manager
+* Add the Certificate ARN to the cdk.json
+* Update references to the OC docker containers in [app.py](app.py)
+  (i.e. ghcr.io/sage-bionetworks/openchallenges-xxx:<tag>)
+* (Optional) Update the ServiceProps objects in [app.py](app.py) with parameters specific to
+  each container.
+
+## Login with the AWS CLI
 
 > [!NOTE]
 > This and the following sections assume that you are working in the AWS account
@@ -239,7 +257,7 @@ As a Developer working in Sage IT Sandbox AWS account, add the following profile
 [profile itsandbox-dev]
 sso_start_url = https://d-906769aa66.awsapps.com/start
 sso_region = us-east-1
-sso_account_id = 804034162148
+sso_account_id = XXXXXXXXX
 sso_role_name = Developer
 ```
 
@@ -250,7 +268,7 @@ aws --profile itsandbox-dev sso login
 ```
 
 
-# Deployment
+## Deploy
 
 Deployment requires setting up an [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) then executing the
 following command:

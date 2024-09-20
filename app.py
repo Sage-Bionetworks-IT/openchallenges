@@ -39,7 +39,6 @@ mariadb_props = ServiceProps(
     3306,
     512,
     "ghcr.io/sage-bionetworks/openchallenges-mariadb:edge",
-    # "docker/mariadb",
     {
         "MARIADB_USER": "maria",
         "MARIADB_PASSWORD": secrets["MARIADB_PASSWORD"],
@@ -61,12 +60,7 @@ elasticsearch_props = ServiceProps(
     2048,
     "ghcr.io/sage-bionetworks/openchallenges-elasticsearch:edge",
     {
-        # "node.name":"openchallenges-elasticsearch",
-        # "cluster.name":"openchallenges-elasticsearch",
-        # "discovery.seed_hosts=":"openchallenges-elasticsearch-node-2,openchallenges-elasticsearch-node-3",
-        # "cluster.initial_master_nodes":"openchallenges-elasticsearch,openchallenges-elasticsearch-node-2,openchallenges-elasticsearch-node-3",
         "bootstrap.memory_lock": "true",
-        # "ES_JAVA_OPTS":"-Xms1g -Xmx1g",
         "discovery.type": "single-node",  # https://stackoverflow.com/a/68253868
         "JAVA_TOOL_OPTIONS": "-XX:InitialHeapSize=1g -XX:MaxHeapSize=1g",
     },
