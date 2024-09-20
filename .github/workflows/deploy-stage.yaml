@@ -1,0 +1,19 @@
+name: deploy-stage
+
+on:
+  workflow_run:
+    workflows:
+      - check
+    types:
+      - completed
+    branches:
+      - stage
+
+jobs:
+  deploy:
+    uses: "./.github/workflows/aws-deploy.yaml"
+    with:
+      role-to-assume: "arn:aws:iam::221082174873:role/sagebase-github-oidc-openchallenges-deploy"
+      role-session-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}-${{ github.run_id }}
+      environment: ${{ github.head_ref || github.ref_name }}
+      secrets-location: "ssm"
