@@ -231,8 +231,8 @@ OpenChallenges application.
 * Add OC [secrets](#Secrets) to either the cdk.json or the AWS System Manager parameter store
 * Create an [ACM certificate for the application](#Certificates) using the AWS Certificates Manager
 * Add the Certificate ARN to the cdk.json
-* Update references to the OC docker containers in [app.py](app.py)
-  (i.e. ghcr.io/sage-bionetworks/openchallenges-xxx:<tag>)
+* Update references to the OC docker images in [app.py](app.py)
+  (i.e. `ghcr.io/sage-bionetworks/openchallenges-xxx:<tag>`)
 * (Optional) Update the ServiceProps objects in [app.py](app.py) with parameters specific to
   each container.
 
