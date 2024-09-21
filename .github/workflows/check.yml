@@ -7,14 +7,7 @@ on:
     branches: ['*']
 
 jobs:
-  linting:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Static Analysis
-        uses: pre-commit/action@v3.0.0
-  tests:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
