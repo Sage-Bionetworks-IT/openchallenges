@@ -10,7 +10,7 @@ on:
       - dev
 
 jobs:
-  deploy:
+  aws-deploy:
     uses: "./.github/workflows/aws-deploy.yaml"
     with:
       role-to-assume: "arn:aws:iam::221082174873:role/sagebase-github-oidc-openchallenges-deploy"

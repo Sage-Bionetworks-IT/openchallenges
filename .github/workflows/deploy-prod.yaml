@@ -10,7 +10,7 @@ on:
       - prod
 
 jobs:
-  deploy:
+  aws-deploy:
     uses: "./.github/workflows/aws-deploy.yaml"
     with:
       role-to-assume: "arn:aws:iam::528757786185:role/sagebase-github-oidc-openchallenges-deploy"
