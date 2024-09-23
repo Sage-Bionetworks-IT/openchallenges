@@ -1,0 +1,58 @@
+# reusable template for deployments to AWS accounts
+name: aws-deploy
+
+# Ensures that only one deploy task per branch/environment will run at a time.
+concurrency:
+  group: ${{ inputs.environment }}
+  cancel-in-progress: false
+
+on:
+  workflow_call:
+    inputs:
+      aws-region:
+        type: string
+        default: us-east-1
+      role-to-assume:
+        required: true
+        type: string
+      role-session-name:
+        required: true
+        type: string
+      role-duration-seconds:
+        type: number
+        default: 1200
+      environment:
+        required: true
+        type: string
+        default: "dev"
+      secrets-location:
+        type: string
+        default: "local"
+
+jobs:
+  deploy:
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install AWS CLI
+        run: sudo snap install aws-cli --classic
+      - name: Install AWS CDK CLI
+        run: npm install -g aws-cdk
+      - name: Install python dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{ inputs.aws-region }}
+          role-to-assume: ${{ inputs.role-to-assume }}
+          role-session-name: ${{ inputs.role-session-name }}
+          role-duration-seconds: ${{ inputs.role-duration-seconds }}
+      - name: CDK deploy
+        run: cdk deploy --all --require-approval never
+        env:
+          ENV: ${{ inputs.environment }}
+          SECRETS: ${{ inputs.secrets-location }}
