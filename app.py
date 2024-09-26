@@ -180,7 +180,7 @@ image_service_props = ServiceProps(
         "SERVER_PORT": "8086",
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
         "SERVICE_REGISTRY_URL": "http://openchallenges-service-registry:8081/eureka",
-        "OPENCHALLENGES_IMAGE_SERVICE_THUMBOR_HOST": "https://dev.openchallenges.io/img/",
+        "OPENCHALLENGES_IMAGE_SERVICE_THUMBOR_HOST": "https://{fully_qualified_domain_name}/img/",
         "OPENCHALLENGES_IMAGE_SERVICE_THUMBOR_SECURITY_KEY": secrets["SECURITY_KEY"],
         "OPENCHALLENGES_IMAGE_SERVICE_IS_DEPLOYED_ON_AWS": "true",
     },
