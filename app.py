@@ -299,7 +299,7 @@ oc_app_props = ServiceProps(
         "API_DOCS_URL": f"https://{fully_qualified_domain_name}/api-docs",
         "APP_VERSION": "1.0.0-alpha",
         "CSR_API_URL": f"https://{fully_qualified_domain_name}/api/v1",
-        "DATA_UPDATED_ON": "2023-09-26",
+        "DATA_UPDATED_ON": "2024-10-11",
         "ENVIRONMENT": "production",
         "GOOGLE_TAG_MANAGER_ID": "",
         "SSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
