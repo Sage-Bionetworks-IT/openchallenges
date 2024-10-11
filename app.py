@@ -14,6 +14,7 @@ app = cdk.App()
 # get the environment
 environment = utils.get_environment()
 stack_name_prefix = f"openchallenges-{environment}"
+image_version = "0.0.11"
 
 # get VARS from cdk.json
 env_vars = app.node.try_get_context(environment)
@@ -38,7 +39,7 @@ mariadb_props = ServiceProps(
     "openchallenges-mariadb",
     3306,
     512,
-    "ghcr.io/sage-bionetworks/openchallenges-mariadb:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-mariadb:{image_version}",
     {
         "MARIADB_USER": "maria",
         "MARIADB_PASSWORD": secrets["MARIADB_PASSWORD"],
@@ -58,7 +59,7 @@ elasticsearch_props = ServiceProps(
     "openchallenges-elasticsearch",
     9200,
     2048,
-    "ghcr.io/sage-bionetworks/openchallenges-elasticsearch:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-elasticsearch:{image_version}",
     {
         "bootstrap.memory_lock": "true",
         "discovery.type": "single-node",  # https://stackoverflow.com/a/68253868
@@ -78,7 +79,7 @@ thumbor_props = ServiceProps(
     "openchallenges-thumbor",
     8889,
     512,
-    "ghcr.io/sage-bionetworks/openchallenges-thumbor:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-thumbor:{image_version}",
     {
         "LOG_LEVEL": "info",
         "PORT": "8889",
@@ -115,7 +116,7 @@ config_server_props = ServiceProps(
     "openchallenges-config-server",
     8090,
     1024,
-    "ghcr.io/sage-bionetworks/openchallenges-config-server:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-config-server:{image_version}",
     {
         "GIT_DEFAULT_LABEL": "test-2",
         "GIT_HOST_KEY_ALGORITHM": "ssh-ed25519",
@@ -138,7 +139,7 @@ service_registry_props = ServiceProps(
     "openchallenges-service-registry",
     8081,
     1024,
-    "ghcr.io/sage-bionetworks/openchallenges-service-registry:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-service-registry:{image_version}",
     {
         "SERVER_PORT": "8081",
         "DEFAULT_ZONE": "http://localhost:8081/eureka",
@@ -159,7 +160,7 @@ zipkin_props = ServiceProps(
     "openchallenges-zipkin",
     9411,
     512,
-    "ghcr.io/sage-bionetworks/openchallenges-zipkin:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-zipkin:{image_version}",
     {},
 )
 
@@ -175,7 +176,7 @@ image_service_props = ServiceProps(
     "openchallenges-image-service",
     8086,
     1024,
-    "ghcr.io/sage-bionetworks/openchallenges-image-service:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-image-service:{image_version}",
     {
         "SERVER_PORT": "8086",
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
@@ -201,7 +202,7 @@ challenge_service_props = ServiceProps(
     "openchallenges-challenge-service",
     8085,
     1024,
-    "ghcr.io/sage-bionetworks/openchallenges-challenge-service:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-challenge-service:{image_version}",
     {
         "SERVER_PORT": "8085",
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
@@ -239,7 +240,7 @@ organization_service_props = ServiceProps(
     "openchallenges-organization-service",
     8084,
     1024,
-    "ghcr.io/sage-bionetworks/openchallenges-organization-service:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-organization-service:{image_version}",
     {
         "SERVER_PORT": "8084",
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
@@ -270,7 +271,7 @@ api_gateway_props = ServiceProps(
     "openchallenges-api-gateway",
     8082,
     1024,
-    "ghcr.io/sage-bionetworks/openchallenges-api-gateway:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-api-gateway:{image_version}",
     {
         "SERVER_PORT": "8082",
         "SPRING_CLOUD_CONFIG_URI": "http://openchallenges-config-server:8090",
@@ -293,14 +294,14 @@ oc_app_props = ServiceProps(
     "openchallenges-app",
     4200,
     1024,
-    "ghcr.io/sage-bionetworks/openchallenges-app:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-app:{image_version}",
     {
         "API_DOCS_URL": f"https://{fully_qualified_domain_name}/api-docs",
         "APP_VERSION": "1.0.0-alpha",
         "CSR_API_URL": f"https://{fully_qualified_domain_name}/api/v1",
-        "DATA_UPDATED_ON": "2023-09-26",
+        "DATA_UPDATED_ON": "2024-10-11",
         "ENVIRONMENT": "production",
-        "GOOGLE_TAG_MANAGER_ID": "",
+        "GOOGLE_TAG_MANAGER_ID": "GTM-NBR5XD8C",
         "SSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
     },
 )
@@ -325,7 +326,7 @@ api_docs_props = ServiceProps(
     "openchallenges-api-docs",
     8010,
     256,
-    "ghcr.io/sage-bionetworks/openchallenges-api-docs:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-api-docs:{image_version}",
     {"PORT": "8010"},
 )
 api_docs_stack = ServiceStack(
@@ -340,7 +341,7 @@ apex_service_props = ServiceProps(
     "openchallenges-apex",
     8000,
     200,
-    "ghcr.io/sage-bionetworks/openchallenges-apex:edge",
+    f"ghcr.io/sage-bionetworks/openchallenges-apex:{image_version}",
     {
         "API_DOCS_HOST": "openchallenges-api-docs",
         "API_DOCS_PORT": "8010",
