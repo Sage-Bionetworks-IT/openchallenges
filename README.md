@@ -233,7 +233,7 @@ OpenChallenges application.
 * Add the Certificate ARN to the cdk.json
 * Update references to the OC docker images in [app.py](app.py)
   (i.e. `ghcr.io/sage-bionetworks/openchallenges-xxx:<tag>`)
-* (Optional) Update the ServiceProps objects in [app.py](app.py) with parameters specific to
+* (Optional) Update the `ServiceProps` objects in [app.py](app.py) with parameters specific to
   each container.
 
 ## Login with the AWS CLI
