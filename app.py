@@ -6,7 +6,7 @@ from openchallenges.ecs_stack import EcsStack
 from openchallenges.service_stack import ServiceStack
 from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
-from openchallenges.service_props import ServiceProps
+from openchallenges.service_props import ServiceProps, ContainerVolume
 import openchallenges.utils as utils
 
 app = cdk.App()
@@ -45,6 +45,12 @@ mariadb_props = ServiceProps(
         "MARIADB_PASSWORD": secrets["MARIADB_PASSWORD"],
         "MARIADB_ROOT_PASSWORD": secrets["MARIADB_ROOT_PASSWORD"],
     },
+    container_volumes=[
+        ContainerVolume(
+            path="/data/db",
+            size=30,
+        )
+    ],
 )
 
 mariadb_stack = ServiceStack(

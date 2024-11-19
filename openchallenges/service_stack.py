@@ -118,14 +118,14 @@ class ServiceStack(cdk.Stack):
             ),
         )
 
-        # mount volume for DB
-        if "mariadb" in construct_id:
-            self.volume = ecs.ServiceManagedVolume(
+        # mount volumes
+        for container_volume in props.container_volumes:
+            service_volume = ecs.ServiceManagedVolume(
                 self,
-                "ServiceVolume",
+                "ContainerVolume",
                 name=props.container_name,
                 managed_ebs_volume=ecs.ServiceManagedEBSVolumeConfiguration(
-                    size=size.gibibytes(30),
+                    size=size.gibibytes(container_volume.size),
                     volume_type=ec2.EbsDeviceVolumeType.GP3,
                 ),
             )
@@ -133,13 +133,12 @@ class ServiceStack(cdk.Stack):
             self.task_definition.add_volume(
                 name=props.container_name, configured_at_launch=True
             )
-            self.service.add_volume(self.volume)
+            self.service.add_volume(service_volume)
 
-            self.volume.mount_in(
-                # should be mounted at openchallenges-mariadb:/data/db
+            service_volume.mount_in(
                 self.container,
-                container_path="/data/db",
-                read_only=False,
+                container_path=container_volume.path,
+                read_only=container_volume.read_only,
             )
 
 
