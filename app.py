@@ -14,7 +14,7 @@ app = cdk.App()
 # get the environment
 environment = utils.get_environment()
 stack_name_prefix = f"openchallenges-{environment}"
-image_version = "0.0.12"
+image_version = "1.1.1"
 
 # get VARS from cdk.json
 env_vars = app.node.try_get_context(environment)
@@ -303,9 +303,9 @@ oc_app_props = ServiceProps(
     f"ghcr.io/sage-bionetworks/openchallenges-app:{image_version}",
     {
         "API_DOCS_URL": f"https://{fully_qualified_domain_name}/api-docs",
-        "APP_VERSION": "1.0.12-beta",
+        "APP_VERSION": image_version,
         "CSR_API_URL": f"https://{fully_qualified_domain_name}/api/v1",
-        "DATA_UPDATED_ON": "2024-11-13",
+        "DATA_UPDATED_ON": "2024-11-27",
         "ENVIRONMENT": "production",
         "GOOGLE_TAG_MANAGER_ID": "GTM-NBR5XD8C",
         "SSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
