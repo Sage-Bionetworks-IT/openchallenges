@@ -41,9 +41,6 @@ class ServiceStack(cdk.Stack):
             assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
-                iam.ManagedPolicy.from_aws_managed_policy_name(
-                    "service-role/service-role/AmazonECSTaskExecutionRolePolicy"
-                ),
             ],
         )
         task_role.add_to_policy(
@@ -57,28 +54,6 @@ class ServiceStack(cdk.Stack):
                     "ssmmessages:CreateDataChannel",
                     "ssmmessages:OpenControlChannel",
                     "ssmmessages:OpenDataChannel",
-                ],
-                resources=["*"],
-                effect=iam.Effect.ALLOW,
-            )
-        )
-
-        # default ECS execution policy plus Guardduty access
-        execution_role = iam.Role(
-            self,
-            "ExecutionRole",
-            assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
-            managed_policies=[
-                iam.ManagedPolicy.from_aws_managed_policy_name(
-                    "service-role/AmazonECSTaskExecutionRolePolicy"
-                ),
-            ],
-        )
-        execution_role.add_to_policy(
-            iam.PolicyStatement(
-                actions=[
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents",
                 ],
                 resources=["*"],
                 effect=iam.Effect.ALLOW,
