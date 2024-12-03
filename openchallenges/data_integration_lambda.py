@@ -31,7 +31,7 @@ class DataIntegrationLambda(Construct):
             code=_lambda.DockerImageCode.from_image_asset(
                 # Directory relative to where you execute cdk deploy contains a
                 # Dockerfile with build instructions.
-                directory="cdk_docker/data_integration_lambda"
+                directory="cdk_docker/data-integration-lambda"
             ),
             role=role,
             memory_size=128,
