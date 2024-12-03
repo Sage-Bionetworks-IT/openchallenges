@@ -7,6 +7,7 @@ from openchallenges.service_stack import ServiceStack
 from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps, ContainerVolume
+from openchallenges.data_integration_stack import DataIntegrationStack
 import openchallenges.utils as utils
 
 app = cdk.App()
@@ -326,6 +327,10 @@ oc_app_stack.add_dependency(image_service_stack)
 # client service is running and available the public, but a backend isn't.
 load_balancer_stack = LoadBalancerStack(
     app, f"{stack_name_prefix}-load-balancer", network_stack.vpc
+)
+
+data_integration_stack = DataIntegrationStack(
+    app, f"{stack_name_prefix}-data-integration"
 )
 
 api_docs_props = ServiceProps(
