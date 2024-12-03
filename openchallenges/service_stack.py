@@ -63,6 +63,50 @@ class ServiceStack(cdk.Stack):
             )
         )
 
+        # default ECS execution policy plus Guardduty access
+        execution_role = iam.Role(
+            self,
+            "ExecutionRole",
+            assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name(
+                    "service-role/AmazonECSTaskExecutionRolePolicy"
+                ),
+            ],
+        )
+        execution_role.add_to_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                ],
+                resources=["*"],
+                effect=iam.Effect.ALLOW,
+            )
+        )
+
+        # default ECS execution policy plus Guardduty access
+        execution_role = iam.Role(
+            self,
+            "ExecutionRole",
+            assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name(
+                    "service-role/AmazonECSTaskExecutionRolePolicy"
+                ),
+            ],
+        )
+        execution_role.add_to_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                ],
+                resources=["*"],
+                effect=iam.Effect.ALLOW,
+            )
+        )
+
         # ECS task with fargate
         self.task_definition = ecs.FargateTaskDefinition(
             self,
@@ -70,6 +114,7 @@ class ServiceStack(cdk.Stack):
             cpu=1024,
             memory_limit_mib=4096,
             task_role=task_role,
+            execution_role=execution_role,
         )
 
         image = ecs.ContainerImage.from_registry(props.container_location)
