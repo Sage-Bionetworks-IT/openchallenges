@@ -1,14 +1,6 @@
 {
   "name": "AWS CDK & Python Development Environment",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
-  "containerEnv": {
-    "ENV": "${localEnv:ENV}",
-    "SECRETS": "${localEnv:SECRETS}",
-    "AWS_ACCESS_KEY_ID": "${localEnv:AWS_ACCESS_KEY_ID}",
-    "AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}",
-    "AWS_SESSION_TOKEN": "${localEnv:AWS_SESSION_TOKEN}",
-    "AWS_REGION": "${localEnv:AWS_REGION}"
-  },
   "features": {
     "ghcr.io/devcontainers/features/node:1.5.0": {
       "version": "22.6.0"
