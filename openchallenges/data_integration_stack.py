@@ -59,7 +59,7 @@ class DataIntegrationStack(cdk.Stack):
             flexible_time_window=scheduler.CfnSchedule.FlexibleTimeWindowProperty(
                 mode="OFF",
             ),
-            schedule_expression="rate(5 minute)",
+            schedule_expression="rate(5 minutes)",
             group_name=schedule_group.name,
             target=scheduler.CfnSchedule.TargetProperty(
                 arn=event_bus.event_bus_arn,
