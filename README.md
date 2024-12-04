@@ -37,7 +37,8 @@ All the development tools are provided when developing inside the dev container
 also include a Python virtual environment where all the Python packages needed
 are already installed.
 
-To setup these tools and install the project dependencies, run:
+If you decide the develop outside of the dev container, some of the development
+tools can be installed manually by running:
 
 ```console
 ./tools/setup.sh
