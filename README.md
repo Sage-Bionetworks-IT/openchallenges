@@ -44,6 +44,11 @@ tools can be installed by running:
 ./tools/setup.sh
 ```
 
+When developing outside the dev container, the following tools must be installed
+manually.
+
+- [Docker](https://docs.docker.com/engine/install/) >= v27
+
 Development requires the activation of the Python virtual environment:
 
 ```
