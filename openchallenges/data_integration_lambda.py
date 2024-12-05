@@ -35,5 +35,4 @@ class DataIntegrationLambda(Construct):
             ),
             role=role,
             memory_size=128,
-            architecture=_lambda.Architecture.X86_64,
         )
