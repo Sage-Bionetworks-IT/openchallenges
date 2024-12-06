@@ -9,10 +9,36 @@ from constructs import Construct
 
 
 class DataIntegrationStack(cdk.Stack):
+    """
+    Defines an AWS CDK stack for data integration.
+
+    This stack sets up the resources required for scheduling and executing
+    data integration tasks using AWS Lambda and EventBridge Scheduler.
+
+    The stack includes:
+    - A Lambda function for data integration.
+    - An EventBridge Scheduler schedule to trigger the Lambda function.
+    - An EventBridge Scheduler group for organizing schedules.
+
+    Attributes:
+        scope (Construct): The parent construct.
+        id (str): The unique identifier for this stack.
+        props (DataIntegrationProps): The properties for the data integration, including the schedule.
+    """
 
     def __init__(
         self, scope: Construct, id: str, props: DataIntegrationProps, **kwargs
     ) -> None:
+        """
+        Initializes the DataIntegrationStack.
+
+        Arguments:
+            scope (Construct): The parent construct for this stack.
+            id (str): The unique identifier for this stack.
+            props (DataIntegrationProps): The properties required for data integration,
+                including the schedule.
+            **kwargs: Additional arguments passed to the base `cdk.Stack` class.
+        """
         super().__init__(scope, id, **kwargs)
 
         data_integration_lambda = DataIntegrationLambda(self, "data-integration-lambda")
