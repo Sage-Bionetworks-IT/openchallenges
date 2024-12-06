@@ -5,7 +5,11 @@ from aws_cdk.aws_scheduler_alpha import ScheduleExpression
 @dataclass
 class DataIntegrationProps:
     """
-    Data integration properties
+    Data integration properties.
+
+    Attributes:
+        schedule (ScheduleExpression): The schedule for triggering the data integration.
     """
 
     schedule: ScheduleExpression
+    """The schedule for triggering the data integration."""
