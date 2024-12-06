@@ -1,80 +1,40 @@
 import aws_cdk as cdk
 from aws_cdk import (
-    CfnOutput,
-    aws_events as events,
-    aws_events_targets as event_target,
-    aws_iam as iam,
-    aws_scheduler as scheduler,
+    aws_scheduler_alpha as scheduler_alpha,
+    aws_scheduler_targets_alpha as scheduler_targets,
 )
 from openchallenges.data_integration_lambda import DataIntegrationLambda
+from openchallenges.data_integration_props import DataIntegrationProps
 from constructs import Construct
 
 
 class DataIntegrationStack(cdk.Stack):
 
-    def __init__(self, scope: Construct, id: str, **kwargs) -> None:
+    def __init__(
+        self, scope: Construct, id: str, props: DataIntegrationProps, **kwargs
+    ) -> None:
         super().__init__(scope, id, **kwargs)
 
         data_integration_lambda = DataIntegrationLambda(self, "data-integration-lambda")
 
-        event_bus = events.EventBus(self, "event-bus")
-
-        event_rule = events.Rule(
-            self,
-            "event-rule",
-            event_bus=event_bus,
-            event_pattern=events.EventPattern(source=["scheduled.events"]),
+        target = scheduler_targets.LambdaInvoke(
+            data_integration_lambda.lambda_function,
+            input=scheduler_alpha.ScheduleTargetInput.from_object({}),
         )
-
-        # Set the event rule target to the lambda function
-        event_rule.add_target(
-            event_target.LambdaFunction(data_integration_lambda.lambda_function)
-        )
-
-        scheduler_role = iam.Role(
-            self,
-            "scheduler-role",
-            assumed_by=iam.ServicePrincipal("scheduler.amazonaws.com"),
-        )
-
-        scheduler_events_policy = iam.PolicyStatement(
-            actions=["events:PutEvents"],
-            resources=[event_bus.event_bus_arn],
-            effect=iam.Effect.ALLOW,
-        )
-
-        scheduler_role.add_to_policy(scheduler_events_policy)
 
         # Create a group for the schedule (maybe we want to add more schedules
         # to this group the future)
-        schedule_group = scheduler.CfnScheduleGroup(
+        schedule_group = scheduler_alpha.Group(
             self,
-            "schedule-group",
-            name="schedule-group",
+            "group",
+            group_name="schedule-group",
         )
 
-        schedule = scheduler.CfnSchedule(
+        scheduler_alpha.Schedule(
             self,
             "schedule",
-            flexible_time_window=scheduler.CfnSchedule.FlexibleTimeWindowProperty(
-                mode="OFF",
-            ),
-            schedule_expression="rate(5 minutes)",
-            group_name=schedule_group.name,
-            target=scheduler.CfnSchedule.TargetProperty(
-                arn=event_bus.event_bus_arn,
-                role_arn=scheduler_role.role_arn,
-                event_bridge_parameters=scheduler.CfnSchedule.EventBridgeParametersProperty(
-                    detail_type="ScheduleTriggered", source="scheduled.events"
-                ),
-            ),
-        )
-
-        # Output
-        CfnOutput(self, "SCHEDULE_NAME", value=schedule.ref)
-        CfnOutput(self, "EVENT_BUS_NAME", value=event_bus.event_bus_name)
-        CfnOutput(
-            self,
-            "LAMBDA_FUNCTION_NAME",
-            value=data_integration_lambda.lambda_function.function_name,
+            schedule=props.schedule,
+            target=target,
+            group=schedule_group,
+            description="This is a cron-based schedule that will run every 5 minutes",
         )
