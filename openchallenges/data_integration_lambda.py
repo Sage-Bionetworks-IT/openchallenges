@@ -1,5 +1,5 @@
 from aws_cdk import aws_iam as iam
-from aws_cdk import aws_lambda as _lambda
+from aws_cdk import aws_lambda as lambda_
 from constructs import Construct
 
 
@@ -37,7 +37,7 @@ class DataIntegrationLambda(Construct):
             ],
         )
 
-    def _build_lambda_function(self, role: iam.Role) -> _lambda.Function:
+    def _build_lambda_function(self, role: iam.Role) -> lambda_.Function:
         """
         Builds the Docker-based AWS Lambda function.
 
@@ -49,10 +49,10 @@ class DataIntegrationLambda(Construct):
         Returns:
             _lambda.Function: The Docker-based AWS Lambda function.
         """
-        return _lambda.DockerImageFunction(
+        return lambda_.DockerImageFunction(
             self,
             "LambdaFunction",
-            code=_lambda.DockerImageCode.from_image_asset(
+            code=lambda_.DockerImageCode.from_image_asset(
                 # Directory relative to where you execute cdk deploy contains a
                 # Dockerfile with build instructions.
                 directory="cdk_docker/data-integration-lambda"
