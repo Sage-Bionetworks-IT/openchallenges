@@ -4,8 +4,22 @@ from constructs import Construct
 
 
 class DataIntegrationLambda(Construct):
+    """
+    A CDK construct to define an AWS Lambda function for data integration.
+
+    This construct creates an IAM role with the necessary permissions and a Docker-based
+    Lambda function for handling data integration tasks.
+    """
 
     def __init__(self, scope: Construct, id: str) -> None:
+        """
+        Builds the IAM role for the Lambda function.
+
+        This role allows the Lambda function to execute basic AWS operations.
+
+        Returns:
+            iam.Role: The IAM role for the Lambda function.
+        """
         super().__init__(scope, id)
 
         self.lambda_role = self._build_lambda_role()
@@ -23,8 +37,18 @@ class DataIntegrationLambda(Construct):
             ],
         )
 
-    # Create the Lambda function using a GHCR image
     def _build_lambda_function(self, role: iam.Role) -> _lambda.Function:
+        """
+        Builds the Docker-based AWS Lambda function.
+
+        The Lambda function uses a Docker image built from a local directory.
+
+        Args:
+            role (iam.Role): The IAM role to associate with the Lambda function.
+
+        Returns:
+            _lambda.Function: The Docker-based AWS Lambda function.
+        """
         return _lambda.DockerImageFunction(
             self,
             "LambdaFunction",
