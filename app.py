@@ -1,4 +1,5 @@
 import aws_cdk as cdk
+from aws_cdk.aws_scheduler_alpha import ScheduleExpression
 
 from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
@@ -7,6 +8,8 @@ from openchallenges.service_stack import ServiceStack
 from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
 from openchallenges.service_props import ServiceProps, ContainerVolume
+from openchallenges.data_integration_stack import DataIntegrationStack
+from openchallenges.data_integration_props import DataIntegrationProps
 import openchallenges.utils as utils
 
 app = cdk.App()
@@ -326,6 +329,19 @@ oc_app_stack.add_dependency(image_service_stack)
 # client service is running and available the public, but a backend isn't.
 load_balancer_stack = LoadBalancerStack(
     app, f"{stack_name_prefix}-load-balancer", network_stack.vpc
+)
+
+data_integration_props = DataIntegrationProps(
+    schedule=ScheduleExpression.cron(
+        minute="*/5",
+        hour="*",
+        day="*",
+        month="*",
+        time_zone=cdk.TimeZone.AMERICA_LOS_ANGELES,
+    )
+)
+data_integration_stack = DataIntegrationStack(
+    app, f"{stack_name_prefix}-data-integration", data_integration_props
 )
 
 api_docs_props = ServiceProps(

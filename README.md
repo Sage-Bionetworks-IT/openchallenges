@@ -38,7 +38,7 @@ also include a Python virtual environment where all the Python packages needed
 are already installed.
 
 If you decide the develop outside of the dev container, some of the development
-tools can be installed by running:
+tools can be installed manually by running:
 
 ```console
 ./tools/setup.sh
