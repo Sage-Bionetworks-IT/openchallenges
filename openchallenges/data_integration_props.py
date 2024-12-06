@@ -1,13 +1,11 @@
+from dataclasses import dataclass
 from aws_cdk.aws_scheduler_alpha import ScheduleExpression
 
 
+@dataclass
 class DataIntegrationProps:
     """
     Data integration properties
     """
 
-    def __init__(
-        self,
-        schedule: ScheduleExpression,
-    ) -> None:
-        self.schedule = schedule
+    schedule: ScheduleExpression
