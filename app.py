@@ -338,7 +338,8 @@ data_integration_props = DataIntegrationProps(
         day="*",
         month="*",
         time_zone=cdk.TimeZone.AMERICA_LOS_ANGELES,
-    )
+    ),
+    schedule_description="This is a cron-based schedule that will run every 5 minutes",
 )
 data_integration_stack = DataIntegrationStack(
     app, f"{stack_name_prefix}-data-integration", data_integration_props

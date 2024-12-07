@@ -9,7 +9,11 @@ class DataIntegrationProps:
 
     Attributes:
         schedule (ScheduleExpression): The schedule for triggering the data integration.
+        schedule_description (str): The description of the schedule.
     """
 
     schedule: ScheduleExpression
     """The schedule for triggering the data integration."""
+
+    schedule_description: str
+    """The description of the schedule."""
