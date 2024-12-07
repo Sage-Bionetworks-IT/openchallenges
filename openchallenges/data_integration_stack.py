@@ -62,5 +62,5 @@ class DataIntegrationStack(cdk.Stack):
             schedule=props.schedule,
             target=target,
             group=schedule_group,
-            description="This is a cron-based schedule that will run every 5 minutes",
+            description=props.schedule_description,
         )
