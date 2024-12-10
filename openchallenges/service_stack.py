@@ -60,6 +60,28 @@ class ServiceStack(cdk.Stack):
             )
         )
 
+        # default ECS execution policy plus Guardduty access
+        execution_role = iam.Role(
+            self,
+            "ExecutionRole",
+            assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name(
+                    "service-role/AmazonECSTaskExecutionRolePolicy"
+                ),
+            ],
+        )
+        execution_role.add_to_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                ],
+                resources=["*"],
+                effect=iam.Effect.ALLOW,
+            )
+        )
+
         # ECS task with fargate
         self.task_definition = ecs.FargateTaskDefinition(
             self,
@@ -67,6 +89,7 @@ class ServiceStack(cdk.Stack):
             cpu=1024,
             memory_limit_mib=4096,
             task_role=task_role,
+            execution_role=execution_role,
         )
 
         image = ecs.ContainerImage.from_registry(props.container_location)
@@ -118,14 +141,14 @@ class ServiceStack(cdk.Stack):
             ),
         )
 
-        # mount volume for DB
-        if "mariadb" in construct_id:
-            self.volume = ecs.ServiceManagedVolume(
+        # mount volumes
+        for container_volume in props.container_volumes:
+            service_volume = ecs.ServiceManagedVolume(
                 self,
-                "ServiceVolume",
+                "ContainerVolume",
                 name=props.container_name,
                 managed_ebs_volume=ecs.ServiceManagedEBSVolumeConfiguration(
-                    size=size.gibibytes(30),
+                    size=size.gibibytes(container_volume.size),
                     volume_type=ec2.EbsDeviceVolumeType.GP3,
                 ),
             )
@@ -133,13 +156,12 @@ class ServiceStack(cdk.Stack):
             self.task_definition.add_volume(
                 name=props.container_name, configured_at_launch=True
             )
-            self.service.add_volume(self.volume)
+            self.service.add_volume(service_volume)
 
-            self.volume.mount_in(
-                # should be mounted at openchallenges-mariadb:/data/db
+            service_volume.mount_in(
                 self.container,
-                container_path="/data/db",
-                read_only=False,
+                container_path=container_volume.path,
+                read_only=container_volume.read_only,
             )
 
 

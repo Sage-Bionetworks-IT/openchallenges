@@ -1,4 +1,5 @@
 import aws_cdk as cdk
+from aws_cdk.aws_scheduler_alpha import ScheduleExpression
 
 from openchallenges.bucket_stack import BucketStack
 from openchallenges.network_stack import NetworkStack
@@ -6,7 +7,9 @@ from openchallenges.ecs_stack import EcsStack
 from openchallenges.service_stack import ServiceStack
 from openchallenges.service_stack import LoadBalancedServiceStack
 from openchallenges.load_balancer_stack import LoadBalancerStack
-from openchallenges.service_props import ServiceProps
+from openchallenges.service_props import ServiceProps, ContainerVolume
+from openchallenges.data_integration_stack import DataIntegrationStack
+from openchallenges.data_integration_props import DataIntegrationProps
 import openchallenges.utils as utils
 
 app = cdk.App()
@@ -14,7 +17,7 @@ app = cdk.App()
 # get the environment
 environment = utils.get_environment()
 stack_name_prefix = f"openchallenges-{environment}"
-image_version = "0.0.11"
+image_version = "1.1.1"
 
 # get VARS from cdk.json
 env_vars = app.node.try_get_context(environment)
@@ -45,6 +48,12 @@ mariadb_props = ServiceProps(
         "MARIADB_PASSWORD": secrets["MARIADB_PASSWORD"],
         "MARIADB_ROOT_PASSWORD": secrets["MARIADB_ROOT_PASSWORD"],
     },
+    container_volumes=[
+        ContainerVolume(
+            path="/data/db",
+            size=30,
+        )
+    ],
 )
 
 mariadb_stack = ServiceStack(
@@ -297,9 +306,9 @@ oc_app_props = ServiceProps(
     f"ghcr.io/sage-bionetworks/openchallenges-app:{image_version}",
     {
         "API_DOCS_URL": f"https://{fully_qualified_domain_name}/api-docs",
-        "APP_VERSION": "1.0.0-alpha",
+        "APP_VERSION": image_version,
         "CSR_API_URL": f"https://{fully_qualified_domain_name}/api/v1",
-        "DATA_UPDATED_ON": "2024-10-11",
+        "DATA_UPDATED_ON": "2024-11-27",
         "ENVIRONMENT": "production",
         "GOOGLE_TAG_MANAGER_ID": "GTM-NBR5XD8C",
         "SSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
@@ -320,6 +329,20 @@ oc_app_stack.add_dependency(image_service_stack)
 # client service is running and available the public, but a backend isn't.
 load_balancer_stack = LoadBalancerStack(
     app, f"{stack_name_prefix}-load-balancer", network_stack.vpc
+)
+
+data_integration_props = DataIntegrationProps(
+    schedule=ScheduleExpression.cron(
+        minute="*/5",
+        hour="*",
+        day="*",
+        month="*",
+        time_zone=cdk.TimeZone.AMERICA_LOS_ANGELES,
+    ),
+    schedule_description="This is a cron-based schedule that will run every 5 minutes",
+)
+data_integration_stack = DataIntegrationStack(
+    app, f"{stack_name_prefix}-data-integration", data_integration_props
 )
 
 api_docs_props = ServiceProps(
