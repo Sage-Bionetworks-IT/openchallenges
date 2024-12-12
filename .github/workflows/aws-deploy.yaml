@@ -20,7 +20,7 @@ on:
         type: string
       role-duration-seconds:
         type: number
-        default: 3600
+        default: 5400
       environment:
         required: true
         type: string
