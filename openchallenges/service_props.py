@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List
+from openchallenges.fargate_cpu_memory import FargateCpuMemory
 
 CONTAINER_LOCATION_PATH_ID = "path://"
 
@@ -37,6 +38,7 @@ class ServiceProps:
 
     def __init__(
         self,
+        task_cpu_memory: FargateCpuMemory,
         container_name: str,
         container_port: int,
         container_memory: int,
@@ -44,6 +46,7 @@ class ServiceProps:
         container_env_vars: dict,
         container_volumes: List[ContainerVolume] = None,
     ) -> None:
+        self.task_cpu_memory = task_cpu_memory
         self.container_name = container_name
         self.container_port = container_port
         self.container_memory = container_memory

@@ -2,14 +2,15 @@ import aws_cdk as cdk
 from aws_cdk.aws_scheduler_alpha import ScheduleExpression
 
 from openchallenges.bucket_stack import BucketStack
-from openchallenges.network_stack import NetworkStack
-from openchallenges.ecs_stack import EcsStack
-from openchallenges.service_stack import ServiceStack
-from openchallenges.service_stack import LoadBalancedServiceStack
-from openchallenges.load_balancer_stack import LoadBalancerStack
-from openchallenges.service_props import ServiceProps, ContainerVolume
-from openchallenges.data_integration_stack import DataIntegrationStack
 from openchallenges.data_integration_props import DataIntegrationProps
+from openchallenges.data_integration_stack import DataIntegrationStack
+from openchallenges.ecs_stack import EcsStack
+from openchallenges.fargate_cpu_memory import FargateCpuMemory
+from openchallenges.load_balancer_stack import LoadBalancerStack
+from openchallenges.network_stack import NetworkStack
+from openchallenges.service_props import ServiceProps, ContainerVolume
+from openchallenges.service_stack import LoadBalancedServiceStack
+from openchallenges.service_stack import ServiceStack
 import openchallenges.utils as utils
 
 app = cdk.App()
@@ -39,6 +40,7 @@ ecs_stack = EcsStack(
 ecs_stack.add_dependency(network_stack)
 
 mariadb_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-mariadb",
     3306,
     512,
@@ -65,6 +67,7 @@ mariadb_stack = ServiceStack(
 )
 
 elasticsearch_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-elasticsearch",
     9200,
     2048,
@@ -85,6 +88,7 @@ elasticsearch_stack = ServiceStack(
 )
 
 thumbor_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-thumbor",
     8889,
     512,
@@ -122,6 +126,7 @@ thumbor_stack = ServiceStack(
 thumbor_stack.add_dependency(bucket_stack)
 
 config_server_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-config-server",
     8090,
     1024,
@@ -145,6 +150,7 @@ config_server_stack = ServiceStack(
 )
 
 service_registry_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-service-registry",
     8081,
     1024,
@@ -166,6 +172,7 @@ service_registry_stack = ServiceStack(
 service_registry_stack.add_dependency(config_server_stack)
 
 zipkin_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-zipkin",
     9411,
     512,
@@ -182,6 +189,7 @@ zipkin_stack = ServiceStack(
 )
 
 image_service_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-image-service",
     8086,
     1024,
@@ -208,6 +216,7 @@ image_service_stack.add_dependency(thumbor_stack)
 image_service_stack.add_dependency(zipkin_stack)
 
 challenge_service_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-challenge-service",
     8085,
     1024,
@@ -246,6 +255,7 @@ challenge_service_stack.add_dependency(zipkin_stack)
 
 
 organization_service_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-organization-service",
     8084,
     1024,
@@ -277,6 +287,7 @@ organization_service_stack.add_dependency(elasticsearch_stack)
 organization_service_stack.add_dependency(zipkin_stack)
 
 api_gateway_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-api-gateway",
     8082,
     1024,
@@ -300,6 +311,7 @@ api_gateway_stack = ServiceStack(
 api_gateway_stack.add_dependency(service_registry_stack)
 
 oc_app_props = ServiceProps(
+    FargateCpuMemory.CPU_1024_MEM_2048,
     "openchallenges-app",
     4200,
     1024,
@@ -346,6 +358,7 @@ data_integration_stack = DataIntegrationStack(
 )
 
 api_docs_props = ServiceProps(
+    FargateCpuMemory.CPU_256_MEM_512,
     "openchallenges-api-docs",
     8010,
     256,
@@ -361,6 +374,7 @@ api_docs_stack = ServiceStack(
 )
 
 apex_service_props = ServiceProps(
+    FargateCpuMemory.CPU_256_MEM_512,
     "openchallenges-apex",
     8000,
     200,
