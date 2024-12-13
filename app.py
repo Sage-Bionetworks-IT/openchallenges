@@ -39,11 +39,12 @@ ecs_stack = EcsStack(
 )
 ecs_stack.add_dependency(network_stack)
 
+mariadb_cpu_memory = FargateCpuMemory.CPU_1024_MEM_2048
 mariadb_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    mariadb_cpu_memory,
     "openchallenges-mariadb",
     3306,
-    512,
+    mariadb_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-mariadb:{image_version}",
     {
         "MARIADB_USER": "maria",
@@ -66,11 +67,12 @@ mariadb_stack = ServiceStack(
     mariadb_props,
 )
 
+elasticsearch_cpu_memory = FargateCpuMemory.CPU_1024_MEM_2048
 elasticsearch_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    elasticsearch_cpu_memory,
     "openchallenges-elasticsearch",
     9200,
-    2048,
+    elasticsearch_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-elasticsearch:{image_version}",
     {
         "bootstrap.memory_lock": "true",
@@ -87,11 +89,12 @@ elasticsearch_stack = ServiceStack(
     elasticsearch_props,
 )
 
+thumbor_cpu_memory = FargateCpuMemory.CPU_512_MEM_1024
 thumbor_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    thumbor_cpu_memory,
     "openchallenges-thumbor",
     8889,
-    512,
+    thumbor_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-thumbor:{image_version}",
     {
         "LOG_LEVEL": "info",
@@ -125,11 +128,12 @@ thumbor_stack = ServiceStack(
 )
 thumbor_stack.add_dependency(bucket_stack)
 
+config_server_cpu_memory = FargateCpuMemory.CPU_512_MEM_1024
 config_server_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    config_server_cpu_memory,
     "openchallenges-config-server",
     8090,
-    1024,
+    config_server_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-config-server:{image_version}",
     {
         "GIT_DEFAULT_LABEL": "test-2",
@@ -149,11 +153,12 @@ config_server_stack = ServiceStack(
     config_server_props,
 )
 
+service_registry_cpu_memory = FargateCpuMemory.CPU_512_MEM_1024
 service_registry_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    service_registry_cpu_memory,
     "openchallenges-service-registry",
     8081,
-    1024,
+    service_registry_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-service-registry:{image_version}",
     {
         "SERVER_PORT": "8081",
@@ -171,11 +176,12 @@ service_registry_stack = ServiceStack(
 )
 service_registry_stack.add_dependency(config_server_stack)
 
+zipkin_cpu_memory = FargateCpuMemory.CPU_512_MEM_1024
 zipkin_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    zipkin_cpu_memory,
     "openchallenges-zipkin",
     9411,
-    512,
+    zipkin_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-zipkin:{image_version}",
     {},
 )
@@ -188,11 +194,12 @@ zipkin_stack = ServiceStack(
     zipkin_props,
 )
 
+image_service_cpu_memory = FargateCpuMemory.CPU_512_MEM_1024
 image_service_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    image_service_cpu_memory,
     "openchallenges-image-service",
     8086,
-    1024,
+    image_service_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-image-service:{image_version}",
     {
         "SERVER_PORT": "8086",
@@ -215,11 +222,12 @@ image_service_stack.add_dependency(service_registry_stack)
 image_service_stack.add_dependency(thumbor_stack)
 image_service_stack.add_dependency(zipkin_stack)
 
+challenge_service_cpu_memory = FargateCpuMemory.CPU_1024_MEM_2048
 challenge_service_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    challenge_service_cpu_memory,
     "openchallenges-challenge-service",
     8085,
-    1024,
+    challenge_service_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-challenge-service:{image_version}",
     {
         "SERVER_PORT": "8085",
@@ -253,12 +261,12 @@ challenge_service_stack.add_dependency(mariadb_stack)
 challenge_service_stack.add_dependency(elasticsearch_stack)
 challenge_service_stack.add_dependency(zipkin_stack)
 
-
+organization_service_cpu_memory = FargateCpuMemory.CPU_1024_MEM_2048
 organization_service_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    organization_service_cpu_memory,
     "openchallenges-organization-service",
     8084,
-    1024,
+    organization_service_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-organization-service:{image_version}",
     {
         "SERVER_PORT": "8084",
@@ -286,11 +294,12 @@ organization_service_stack.add_dependency(mariadb_stack)
 organization_service_stack.add_dependency(elasticsearch_stack)
 organization_service_stack.add_dependency(zipkin_stack)
 
+api_gateway_cpu_memory = FargateCpuMemory.CPU_512_MEM_1024
 api_gateway_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    api_gateway_cpu_memory,
     "openchallenges-api-gateway",
     8082,
-    1024,
+    api_gateway_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-api-gateway:{image_version}",
     {
         "SERVER_PORT": "8082",
@@ -310,11 +319,12 @@ api_gateway_stack = ServiceStack(
 )
 api_gateway_stack.add_dependency(service_registry_stack)
 
+oc_app_cpu_memory = FargateCpuMemory.CPU_512_MEM_1024
 oc_app_props = ServiceProps(
-    FargateCpuMemory.CPU_1024_MEM_2048,
+    oc_app_cpu_memory,
     "openchallenges-app",
     4200,
-    1024,
+    oc_app_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-app:{image_version}",
     {
         "API_DOCS_URL": f"https://{fully_qualified_domain_name}/api-docs",
@@ -357,11 +367,12 @@ data_integration_stack = DataIntegrationStack(
     app, f"{stack_name_prefix}-data-integration", data_integration_props
 )
 
+api_docs_cpu_memory = FargateCpuMemory.CPU_256_MEM_512
 api_docs_props = ServiceProps(
-    FargateCpuMemory.CPU_256_MEM_512,
+    api_docs_cpu_memory,
     "openchallenges-api-docs",
     8010,
-    256,
+    api_docs_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-api-docs:{image_version}",
     {"PORT": "8010"},
 )
@@ -373,11 +384,12 @@ api_docs_stack = ServiceStack(
     api_docs_props,
 )
 
+apex_cpu_memory = FargateCpuMemory.CPU_256_MEM_512
 apex_service_props = ServiceProps(
-    FargateCpuMemory.CPU_256_MEM_512,
+    apex_cpu_memory,
     "openchallenges-apex",
     8000,
-    200,
+    apex_cpu_memory.memory,
     f"ghcr.io/sage-bionetworks/openchallenges-apex:{image_version}",
     {
         "API_DOCS_HOST": "openchallenges-api-docs",
