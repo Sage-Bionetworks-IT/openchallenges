@@ -17,7 +17,7 @@ app = cdk.App()
 # get the environment
 environment = utils.get_environment()
 stack_name_prefix = f"openchallenges-{environment}"
-image_version = "1.1.2"
+image_version = "1.3.1"
 
 # get VARS from cdk.json
 env_vars = app.node.try_get_context(environment)
