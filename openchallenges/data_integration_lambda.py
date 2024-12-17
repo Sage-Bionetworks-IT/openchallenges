@@ -28,7 +28,7 @@ class DataIntegrationLambda(Construct):
     def _build_lambda_role(self) -> iam.Role:
         return iam.Role(
             self,
-            "LambdaRole",
+            f"{id}-LambdaRole",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name(
@@ -51,7 +51,7 @@ class DataIntegrationLambda(Construct):
         """
         return lambda_.DockerImageFunction(
             self,
-            "LambdaFunction",
+            f"{id}-LambdaFunction",
             code=lambda_.DockerImageCode.from_image_asset(
                 # Directory relative to where you execute cdk deploy contains a
                 # Dockerfile with build instructions.
