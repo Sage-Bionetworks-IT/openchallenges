@@ -41,7 +41,7 @@ class DataIntegrationStack(cdk.Stack):
         """
         super().__init__(scope, id, **kwargs)
 
-        data_integration_lambda = DataIntegrationLambda(self, "data-integration-lambda")
+        data_integration_lambda = DataIntegrationLambda(self, f"${id}-lambda")
 
         target = scheduler_targets.LambdaInvoke(
             data_integration_lambda.lambda_function,
@@ -52,13 +52,13 @@ class DataIntegrationStack(cdk.Stack):
         # to this group the future)
         schedule_group = scheduler_alpha.Group(
             self,
-            "group",
-            group_name="schedule-group",
+            f"${id}-schedule-group",
+            group_name=f"${id}-schedule-group",
         )
 
         scheduler_alpha.Schedule(
             self,
-            "schedule",
+            f"${id}-schedule",
             schedule=props.schedule,
             target=target,
             group=schedule_group,
