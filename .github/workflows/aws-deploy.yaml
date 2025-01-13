@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.environment }}
       - name: Install AWS CLI
         run: sudo snap install aws-cli --classic
       - name: Install AWS CDK CLI
