@@ -63,6 +63,11 @@
     "@aws-cdk/aws-codepipeline:defaultPipelineTypeToV2": true,
     "@aws-cdk/aws-kms:reduceCrossAccountRegionPolicyScope": true,
     "@aws-cdk/aws-eks:nodegroupNameAttribute": true,
+    "dev": {
+        "VPC_CIDR": "10.255.92.0/24",
+        "FQDN": "dev.openchallenges.io",
+        "CERTIFICATE_ARN": "arn:aws:acm:us-east-1:221082174873:certificate/4bd9e6ac-0951-485e-a132-e842aaf2ec58"
+      },
     "stage": {
         "VPC_CIDR": "10.255.93.0/24",
         "FQDN": "stage.openchallenges.io",
