@@ -47,7 +47,7 @@ jobs:
       - name: Install python dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
       - name: Assume AWS Role
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ inputs.aws-region }}
           role-to-assume: ${{ inputs.role-to-assume }}
