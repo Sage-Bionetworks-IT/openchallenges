@@ -1,15 +1,14 @@
 name: deploy-prod
 
 on:
-  workflow_run:
-    workflows:
-      - check
-    types:
-      - completed
-    branches:
-      - prod
+  push:
+    branches: ['prod']
 
 jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+    with:
+      environment: prod
   aws-deploy:
     uses: "./.github/workflows/aws-deploy.yaml"
     with:
