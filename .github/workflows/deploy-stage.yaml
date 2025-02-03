@@ -1,15 +1,14 @@
 name: deploy-stage
 
 on:
-  workflow_run:
-    workflows:
-      - check
-    types:
-      - completed
-    branches:
-      - stage
+  push:
+    branches: ['stage']
 
 jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+    with:
+      environment: stage
   aws-deploy:
     uses: "./.github/workflows/aws-deploy.yaml"
     with:
