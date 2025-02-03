@@ -24,7 +24,6 @@ on:
       environment:
         required: true
         type: string
-        default: "dev"
       secrets-location:
         type: string
         default: "local"
@@ -38,8 +37,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.environment }}
       - name: Install AWS CLI
         run: sudo snap install aws-cli --classic
       - name: Install AWS CDK CLI
@@ -47,7 +44,7 @@ jobs:
       - name: Install python dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
       - name: Assume AWS Role
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ inputs.aws-region }}
           role-to-assume: ${{ inputs.role-to-assume }}

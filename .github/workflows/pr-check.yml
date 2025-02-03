@@ -1,0 +1,11 @@
+name: pr-check
+
+on:
+  pull_request:
+    branches: ['*']
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+    with:
+      environment: dev
