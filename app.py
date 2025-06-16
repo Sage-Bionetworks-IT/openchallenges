@@ -165,22 +165,6 @@ service_registry_stack = ServiceStack(
 )
 service_registry_stack.add_dependency(config_server_stack)
 
-zipkin_props = ServiceProps(
-    "openchallenges-zipkin",
-    9411,
-    512,
-    f"ghcr.io/sage-bionetworks/openchallenges-zipkin:{image_version}",
-    {},
-)
-
-zipkin_stack = ServiceStack(
-    app,
-    f"{stack_name_prefix}-zipkin",
-    network_stack.vpc,
-    ecs_stack.cluster,
-    zipkin_props,
-)
-
 image_service_props = ServiceProps(
     "openchallenges-image-service",
     8086,
@@ -205,7 +189,6 @@ image_service_stack = ServiceStack(
 )
 image_service_stack.add_dependency(service_registry_stack)
 image_service_stack.add_dependency(thumbor_stack)
-image_service_stack.add_dependency(zipkin_stack)
 
 challenge_service_props = ServiceProps(
     "openchallenges-challenge-service",
@@ -242,7 +225,6 @@ challenge_service_stack = ServiceStack(
 challenge_service_stack.add_dependency(service_registry_stack)
 challenge_service_stack.add_dependency(mariadb_stack)
 challenge_service_stack.add_dependency(elasticsearch_stack)
-challenge_service_stack.add_dependency(zipkin_stack)
 
 
 organization_service_props = ServiceProps(
@@ -274,7 +256,6 @@ organization_service_stack = ServiceStack(
 organization_service_stack.add_dependency(image_service_stack)
 organization_service_stack.add_dependency(mariadb_stack)
 organization_service_stack.add_dependency(elasticsearch_stack)
-organization_service_stack.add_dependency(zipkin_stack)
 
 api_gateway_props = ServiceProps(
     "openchallenges-api-gateway",
