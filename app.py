@@ -17,7 +17,7 @@ app = cdk.App()
 # get the environment
 environment = utils.get_environment()
 stack_name_prefix = f"openchallenges-{environment}"
-image_version = "1.3.7"
+image_version = "1.3.8"
 
 # get VARS from cdk.json
 env_vars = app.node.try_get_context(environment)
@@ -289,7 +289,7 @@ oc_app_props = ServiceProps(
         "API_DOCS_URL": f"https://{fully_qualified_domain_name}/api-docs",
         "APP_VERSION": image_version,
         "CSR_API_URL": f"https://{fully_qualified_domain_name}/api/v1",
-        "DATA_UPDATED_ON": "2025-05-15",
+        "DATA_UPDATED_ON": "2025-06-16",
         "ENVIRONMENT": "production",
         "GOOGLE_TAG_MANAGER_ID": "GTM-NBR5XD8C",
         "SSR_API_URL": "http://openchallenges-api-gateway:8082/api/v1",
@@ -355,8 +355,6 @@ apex_service_props = ServiceProps(
         "APP_PORT": "4200",
         "THUMBOR_HOST": "openchallenges-thumbor",
         "THUMBOR_PORT": "8889",
-        "ZIPKIN_HOST": "openchallenges-zipkin",
-        "ZIPKIN_PORT": "9411",
     },
 )
 
