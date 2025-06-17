@@ -86,8 +86,8 @@ class ServiceStack(cdk.Stack):
         self.task_definition = ecs.FargateTaskDefinition(
             self,
             "TaskDef",
-            cpu=1024,
-            memory_limit_mib=4096,
+            cpu=props.container_cpu,
+            memory_limit_mib=props.container_memory,
             task_role=task_role,
             execution_role=execution_role,
         )
@@ -100,6 +100,7 @@ class ServiceStack(cdk.Stack):
         self.container = self.task_definition.add_container(
             props.container_name,
             image=image,
+            cpu=props.container_cpu,
             memory_limit_mib=props.container_memory,
             environment=props.container_env_vars,
             port_mappings=[
