@@ -41,7 +41,7 @@ ecs_stack.add_dependency(network_stack)
 mariadb_props = ServiceProps(
     "openchallenges-mariadb",
     3306,
-    1024,  # 1 vCPU
+    256,  # 0.25 vCPU
     512,  # 512 MiB
     f"ghcr.io/sage-bionetworks/openchallenges-mariadb:{image_version}",
     {
@@ -68,7 +68,7 @@ mariadb_stack = ServiceStack(
 elasticsearch_props = ServiceProps(
     "openchallenges-elasticsearch",
     9200,
-    1024,  # 1 vCPU
+    512,  # 0.5 vCPU
     2048,  # 2 GiB
     f"ghcr.io/sage-bionetworks/openchallenges-elasticsearch:{image_version}",
     {
@@ -89,7 +89,7 @@ elasticsearch_stack = ServiceStack(
 thumbor_props = ServiceProps(
     "openchallenges-thumbor",
     8889,
-    1024,  # 1 vCPU
+    256,  # 0.25 vCPU
     512,  # 512 MiB
     f"ghcr.io/sage-bionetworks/openchallenges-thumbor:{image_version}",
     {
@@ -127,7 +127,7 @@ thumbor_stack.add_dependency(bucket_stack)
 config_server_props = ServiceProps(
     "openchallenges-config-server",
     8090,
-    1024,  # 1 vCPU
+    512,  # 0.5 vCPU
     1024,  # 1 GiB
     f"ghcr.io/sage-bionetworks/openchallenges-config-server:{image_version}",
     {
@@ -151,7 +151,7 @@ config_server_stack = ServiceStack(
 service_registry_props = ServiceProps(
     "openchallenges-service-registry",
     8081,
-    1024,  # 1 vCPU
+    512,  # 0.5 vCPU
     1024,  # 1 GiB
     f"ghcr.io/sage-bionetworks/openchallenges-service-registry:{image_version}",
     {
@@ -173,7 +173,7 @@ service_registry_stack.add_dependency(config_server_stack)
 image_service_props = ServiceProps(
     "openchallenges-image-service",
     8086,
-    1024,  # 1 vCPU
+    512,  # 0.5 vCPU
     1024,  # 1 GiB
     f"ghcr.io/sage-bionetworks/openchallenges-image-service:{image_version}",
     {
@@ -199,7 +199,7 @@ image_service_stack.add_dependency(thumbor_stack)
 challenge_service_props = ServiceProps(
     "openchallenges-challenge-service",
     8085,
-    1024,  # 1 vCPU
+    512,  # 0.5 vCPU
     1024,  # 1 GiB
     f"ghcr.io/sage-bionetworks/openchallenges-challenge-service:{image_version}",
     {
@@ -237,7 +237,7 @@ challenge_service_stack.add_dependency(elasticsearch_stack)
 organization_service_props = ServiceProps(
     "openchallenges-organization-service",
     8084,
-    1024,  # 1 vCPU
+    512,  # 0.5 vCPU
     1024,  # 1 GiB
     f"ghcr.io/sage-bionetworks/openchallenges-organization-service:{image_version}",
     {
@@ -268,7 +268,7 @@ organization_service_stack.add_dependency(elasticsearch_stack)
 api_gateway_props = ServiceProps(
     "openchallenges-api-gateway",
     8082,
-    1024,  # 1 vCPU
+    512,  # 0.5 vCPU
     1024,  # 1 GiB
     f"ghcr.io/sage-bionetworks/openchallenges-api-gateway:{image_version}",
     {
@@ -292,8 +292,8 @@ api_gateway_stack.add_dependency(service_registry_stack)
 oc_app_props = ServiceProps(
     "openchallenges-app",
     4200,
-    1024,  # 1 vCPU
-    1024,  # 1 GiB
+    256,  # 0.25 vCPU
+    512,  # 512 MiB
     f"ghcr.io/sage-bionetworks/openchallenges-app:{image_version}",
     {
         "API_DOCS_URL": f"https://{fully_qualified_domain_name}/api-docs",
@@ -339,8 +339,8 @@ data_integration_stack = DataIntegrationStack(
 api_docs_props = ServiceProps(
     "openchallenges-api-docs",
     8010,
-    1024,  # 1 vCPU
-    256,  # 256 MiB
+    256,  # 0.25 vCPU
+    512,  # 512 MiB
     f"ghcr.io/sage-bionetworks/openchallenges-api-docs:{image_version}",
     {"PORT": "8010"},
 )
@@ -355,8 +355,8 @@ api_docs_stack = ServiceStack(
 apex_service_props = ServiceProps(
     "openchallenges-apex",
     8000,
-    1024,  # 1 vCPU
-    256,  # 256 MiB
+    256,  # 0.25 vCPU
+    512,  # 512 MiB
     f"ghcr.io/sage-bionetworks/openchallenges-apex:{image_version}",
     {
         "API_DOCS_HOST": "openchallenges-api-docs",
