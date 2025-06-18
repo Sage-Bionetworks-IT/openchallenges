@@ -26,6 +26,7 @@ class ServiceProps:
 
     container_name: the name of the container
     container_port: the container application port
+    container_cpu: the container application CPU in millicores (i.e. 1024 = 1 vCPU)
     container_memory: the container application memory
     container_location:
       supports "path://" for building container from local (i.e. path://docker/MyContainer)
@@ -39,6 +40,7 @@ class ServiceProps:
         self,
         container_name: str,
         container_port: int,
+        container_cpu: int,
         container_memory: int,
         container_location: str,
         container_env_vars: dict,
@@ -46,6 +48,7 @@ class ServiceProps:
     ) -> None:
         self.container_name = container_name
         self.container_port = container_port
+        self.container_cpu = container_cpu
         self.container_memory = container_memory
         if CONTAINER_LOCATION_PATH_ID in container_location:
             container_location = container_location.removeprefix(
